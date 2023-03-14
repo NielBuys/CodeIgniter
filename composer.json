@@ -1,6 +1,6 @@
 {
 	"description": "The CodeIgniter framework",
-	"name": "codeigniter/myframework",
+	"name": "nielbuys/framework",
 	"type": "project",
 	"homepage": "https://codeigniter.com",
 	"license": "MIT",

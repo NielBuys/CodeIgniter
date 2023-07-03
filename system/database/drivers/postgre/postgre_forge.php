@@ -92,10 +92,6 @@ class CI_DB_postgre_forge extends CI_DB_forge {
 	{
 		parent::__construct($db);
 
-		if (version_compare($this->db->version(), '9.0', '>'))
-		{
-			$this->_create_table_if = 'CREATE TABLE IF NOT EXISTS';
-		}
 	}
 
 	// --------------------------------------------------------------------

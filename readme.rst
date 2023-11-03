@@ -70,7 +70,7 @@ agreement <https://github.com/NielBuys/CodeIgniter/blob/3.1-stable/license.txt>`
 Resources
 *********
 
--  `User Guide <https://codeigniter.com/docs>`_
+-  `User Guide <https://codeigniter.com/userguide3/>`_
 -  `Contributing Guide <https://github.com/bcit-ci/CodeIgniter/blob/develop/contributing.md>`_
 -  `Language File Translations <https://github.com/bcit-ci/codeigniter3-translations>`_
 -  `Community Forums <http://forum.codeigniter.com/>`_

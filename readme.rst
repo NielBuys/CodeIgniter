@@ -1,5 +1,5 @@
 ###################
-What is CodeIgniter
+Fork of CodeIgniter
 ###################
 
 CodeIgniter is an Application Development Framework - a toolkit - for people
@@ -29,7 +29,7 @@ guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide
 Server Requirements
 *******************
 
-PHP version 7.2 or newer is recommended.
+PHP version 7.2 or newer (PHP 8.2 ready) is recommended.
 
 ************
 Installation

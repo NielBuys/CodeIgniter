@@ -154,7 +154,21 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 
 		if ($this->_config['match_ip'] === TRUE)
 		{
-			$this->_key_prefix .= $_SERVER['REMOTE_ADDR'].':';
+			if (isset($matches['options']))
+			{
+				$save_path['password'] = preg_match('#auth=([^\s&]+)#', $matches['options'], $match) ? $match[1] : NULL;
+				$save_path['database'] = preg_match('#database=(\d+)#', $matches['options'], $match) ? (int) $match[1] : NULL;
+				$save_path['timeout']  = preg_match('#timeout=(\d+\.\d+)#', $matches['options'], $match) ? (float) $match[1] : 0.0;
+
+				preg_match('#prefix=([^\s&]+)#', $matches['options'], $match) && $this->_key_prefix = $match[1];
+			}
+
+			$this->_config['save_path'] = $save_path;
+
+			if ($this->_config['match_ip'] === TRUE)
+			{
+				$this->_key_prefix .= $_SERVER['REMOTE_ADDR'].':';
+			}
 		}
 	}
 

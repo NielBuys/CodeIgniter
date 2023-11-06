@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
     env:
       PHP_INI_VALUES: assert.exception=1, zend.assertions=1
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '8.2', '8.1', '8.0', '7.4', '7.3', '7.2', '7.1', '7.0', '5.6', '5.5', '5.4']
+        php: [ '8.2', '8.1', '8.0', '7.4', '7.3', '7.2']
         DB: [ 'pdo/mysql', 'pdo/pgsql', 'pdo/sqlite', 'mysqli', 'pgsql', 'sqlite' ]
         compiler: [ default ]
         include:
@@ -70,15 +70,6 @@ jobs:
           - php: '8.0'
             DB: 'sqlite'
             compiler: jit
-          - php: '5.6'
-            DB: 'mysql'
-            compiler: default
-          - php: '5.5'
-            DB: 'mysql'
-            compiler: default
-          - php: '5.4'
-            DB: 'mysql'
-            compiler: default
 
     services:
       postgres:
@@ -92,7 +83,7 @@ jobs:
         options: --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=3
 
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_USER: travis

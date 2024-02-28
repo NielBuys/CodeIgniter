@@ -1,6 +1,6 @@
-###################
-Fork of CodeIgniter
-###################
+#####################
+Fork of CodeIgniter 3
+#####################
 
 CodeIgniter is an Application Development Framework - a toolkit - for people
 who build web sites using PHP. Its goal is to enable you to develop projects
@@ -14,16 +14,7 @@ for a given task.
 Release Information
 *******************
 
-This repo contains in-development code for future releases. To download the
-latest stable release please visit the `CodeIgniter Downloads
-<https://codeigniter.com/download>`_ page.
-
-**************************
-Changelog and New Features
-**************************
-
-You can find a list of all changes for each release in the `user
-guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
+https://github.com/NielBuys/CodeIgniter/releases
 
 *******************
 Server Requirements
@@ -70,7 +61,7 @@ agreement <https://github.com/NielBuys/CodeIgniter/blob/3.1-stable/license.txt>`
 Resources
 *********
 
--  `User Guide <https://codeigniter.com/docs>`_
+-  `User Guide <https://codeigniter.com/userguide3/>`_
 -  `Contributing Guide <https://github.com/bcit-ci/CodeIgniter/blob/develop/contributing.md>`_
 -  `Language File Translations <https://github.com/bcit-ci/codeigniter3-translations>`_
 -  `Community Forums <http://forum.codeigniter.com/>`_

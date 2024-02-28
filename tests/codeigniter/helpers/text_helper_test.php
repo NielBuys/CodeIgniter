@@ -103,7 +103,7 @@ class Text_helper_test extends CI_TestCase {
 	{
 		if (substr(PHP_VERSION, 0, 3) >= '8.3')
 		{
-			$expect = "<pre><code style=\"color: #000000\"><span style=\"color: #0000BB\">&lt;?php var_dump</span><span style=\"color: #007700\">(</span><span style=\"color: #0000BB\">$this</span><span style=\"color: #007700\">); </span><span style=\"color: #0000BB\">?&gt; ?&gt;</span></code></pre>";
+			$expect = "<pre><code style=\"color: #000000\"><span style=\"color: #0000BB\">&lt;?php var_dump</span><span style=\"color: #007700\">(</span><span style=\"color: #0000BB\">\$this</span><span style=\"color: #007700\">); </span><span style=\"color: #0000BB\">?&gt; ?&gt;</span></code></pre>";
 		}
 		else
 		{

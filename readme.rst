@@ -20,7 +20,7 @@ https://github.com/NielBuys/CodeIgniter/releases
 Server Requirements
 *******************
 
-PHP version 7.2 or newer (PHP 8.3 ready) is recommended.
+PHP version 7.4 or newer (PHP 8.3 ready) is recommended.
 
 ************
 Installation

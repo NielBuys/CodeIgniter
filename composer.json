@@ -13,9 +13,6 @@
 	"require": {
 		"php": ">=7.4"
 	},
-	"suggest": {
-		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
-	},
 	"scripts": {
 		"test:coverage": [
 			"@putenv XDEBUG_MODE=coverage",

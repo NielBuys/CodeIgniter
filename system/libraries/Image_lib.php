@@ -573,7 +573,7 @@ class CI_Image_lib {
 		else
 		{
 			// Is there a file name?
-			if ( ! preg_match('#\.(jpg|jpeg|gif|png)$#i', $this->new_image))
+			if ( ! preg_match('#\.(jpg|jpeg|gif|png|webp)$#i', $this->new_image))
 			{
 				$this->dest_image  = $this->source_image;
 				$this->dest_folder = $this->new_image;
@@ -953,6 +953,10 @@ class CI_Image_lib {
 			case 3 :
 				$cmd_in		= 'pngtopnm';
 				$cmd_out	= 'ppmtopng';
+				break;
+			case 18 :
+				$cmd_in		= 'webptopnm';
+				$cmd_out	= 'ppmtowebp';
 				break;
 		}
 
@@ -1480,6 +1484,13 @@ class CI_Image_lib {
 				}
 
 				return imagecreatefrompng($path);
+			case 18:
+				if ( ! function_exists('imagecreatefromwebp'))
+				{
+					$this->set_error(array('imglib_unsupported_imagecreate', 'imglib_webp_not_supported'));
+					return FALSE;
+				}
+				return imagecreatefromwebp($path);
 			default:
 				$this->set_error(array('imglib_unsupported_imagecreate'));
 				return FALSE;
@@ -1540,6 +1551,19 @@ class CI_Image_lib {
 					return FALSE;
 				}
 			break;
+			case 18:
+				if ( ! function_exists('imagewebp'))
+				{
+					$this->set_error(array('imglib_unsupported_imagecreate', 'imglib_webp_not_supported'));
+					return FALSE;
+				}
+
+				if ( ! @imagewebp($resource, $this->full_dst_path))
+				{
+					$this->set_error('imglib_save_failed');
+					return FALSE;
+				}
+			break;
 			default:
 				$this->set_error(array('imglib_unsupported_imagecreate'));
 				return FALSE;
@@ -1571,6 +1595,8 @@ class CI_Image_lib {
 			case 2	:	imagejpeg($resource, NULL, $this->quality);
 				break;
 			case 3	:	imagepng($resource);
+				break;
+			case 18	:	imagewebp($resource);
 				break;
 			default:	echo 'Unable to display the image';
 				break;

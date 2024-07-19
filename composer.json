@@ -2,13 +2,17 @@
 	"description": "Fork of CodeIgniter 3",
 	"name": "nielbuys/framework",
 	"type": "project",
-	"homepage": "https://codeigniter.com",
+	"homepage": "https://github.com/NielBuys/CodeIgniter",
 	"license": "MIT",
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
 	"support": {
 		"forum": "http://forum.codeigniter.com/",
-		"wiki": "https://github.com/bcit-ci/CodeIgniter/wiki",
-		"slack": "https://codeigniterchat.slack.com",
-		"source": "https://github.com/bcit-ci/CodeIgniter"
+		"issues": "https://github.com/NielBuys/CodeIgniter/issues",
+		"source": "https://github.com/NielBuys/CodeIgniter"
 	},
 	"require": {
 		"php": ">=7.4"

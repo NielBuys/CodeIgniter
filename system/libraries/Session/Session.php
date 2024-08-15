@@ -392,7 +392,7 @@ class CI_Session {
 		if (PHP_VERSION_ID < 70100)
 		{
 			$hash_function = ini_get('session.hash_function');
-			if (ctype_digit($hash_function))
+			if (ctype_digit((string) $hash_function))
 			{
 				if ($hash_function !== '1')
 				{

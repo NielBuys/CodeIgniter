@@ -638,7 +638,7 @@ class CI_Image_lib {
 		// Set the quality
 		$this->quality = trim(str_replace('%', '', $this->quality));
 
-		if ($this->quality === '' OR $this->quality === 0 OR ! ctype_digit($this->quality))
+		if ($this->quality === '' OR $this->quality === 0 OR ! ctype_digit((string) $this->quality))
 		{
 			$this->quality = 90;
 		}

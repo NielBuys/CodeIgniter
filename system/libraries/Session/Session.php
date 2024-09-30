@@ -389,59 +389,20 @@ class CI_Session {
 	 */
 	protected function _configure_sid_length()
 	{
-		if (PHP_VERSION_ID < 70100)
-		{
-			$hash_function = ini_get('session.hash_function');
-			if (ctype_digit((string) $hash_function))
-			{
-				if ($hash_function !== '1')
-				{
-					ini_set('session.hash_function', 1);
-				}
+        $bits_per_character = (int) ini_get('session.sid_bits_per_character');
+        $sid_length         = (int) ini_get('session.sid_length');
 
-				$bits = 160;
-			}
-			elseif ( ! in_array($hash_function, hash_algos(), TRUE))
-			{
-				ini_set('session.hash_function', 1);
-				$bits = 160;
-			}
-			elseif (($bits = strlen(hash($hash_function, 'dummy', false)) * 4) < 160)
-			{
-				ini_set('session.hash_function', 1);
-				$bits = 160;
-			}
+        // We force the PHP defaults.
+        if (PHP_VERSION_ID < 90000) {
+            if ($bits_per_character !== 4) {
+                ini_set('session.sid_bits_per_character', '4');
+            }
+            if ($sid_length !== 32) {
+                ini_set('session.sid_length', '32');
+            }
+        }
 
-			$bits_per_character = (int) ini_get('session.hash_bits_per_character');
-			$sid_length         = (int) ceil($bits / $bits_per_character);
-		}
-		else
-		{
-			$bits_per_character = (int) ini_get('session.sid_bits_per_character');
-			$sid_length         = (int) ini_get('session.sid_length');
-			if (($bits = $sid_length * $bits_per_character) < 160)
-			{
-				// Add as many more characters as necessary to reach at least 160 bits
-				$sid_length += (int) ceil((160 % $bits) / $bits_per_character);
-				ini_set('session.sid_length', $sid_length);
-			}
-		}
-
-		// Yes, 4,5,6 are the only known possible values as of 2016-10-27
-		switch ($bits_per_character)
-		{
-			case 4:
-				$this->_sid_regexp = '[0-9a-f]';
-				break;
-			case 5:
-				$this->_sid_regexp = '[0-9a-v]';
-				break;
-			case 6:
-				$this->_sid_regexp = '[0-9a-zA-Z,-]';
-				break;
-		}
-
-		$this->_sid_regexp .= '{'.$sid_length.'}';
+        $this->_sid_regexp = '[0-9a-f]{32}';
 	}
 
 	// ------------------------------------------------------------------------

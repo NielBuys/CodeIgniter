@@ -63,8 +63,6 @@ else
 	defined('ICONV_ENABLED') OR define('ICONV_ENABLED', FALSE);
 }
 
-is_php('5.6') && ini_set('php.internal_encoding', 'UTF-8');
-
 if (is_php('7.0'))
 {
 	$test_case_code = file_get_contents(PROJECT_BASE.'vendor/phpunit/phpunit/src/Framework/TestCase.php');

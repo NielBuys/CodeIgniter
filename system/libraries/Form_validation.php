@@ -1211,7 +1211,7 @@ class CI_Form_validation {
 
 		// Apparently, FILTER_VALIDATE_URL doesn't reject digit-only names for some reason ...
 		// See https://github.com/bcit-ci/CodeIgniter/issues/5755
-		if (ctype_digit($str))
+		if (ctype_digit((string) $str))
 		{
 			return FALSE;
 		}

@@ -340,6 +340,20 @@ abstract class CI_DB_driver {
 	protected $_like_escape_chr = '!';
 
 	/**
+	 * RegExp used to escape identifiers
+	 *
+	 * @var array
+	 */
+	protected $_preg_escape_char = array();
+
+	/**
+	 * RegExp used to get operators
+	 *
+	 * @var string[]
+	 */
+	protected $_preg_operators = array();
+
+	/**
 	 * ORDER BY random keyword
 	 *
 	 * @var	array
@@ -1410,18 +1424,16 @@ abstract class CI_DB_driver {
 			return $item;
 		}
 		// Avoid breaking functions and literal values inside queries
-		elseif (ctype_digit($item) OR $item[0] === "'" OR ($this->_escape_char !== '"' && $item[0] === '"') OR strpos($item, '(') !== FALSE)
+		elseif (ctype_digit((string) $item) OR $item[0] === "'" OR ($this->_escape_char !== '"' && $item[0] === '"') OR strpos($item, '(') !== FALSE)
 		{
 			return $item;
 		}
 
-		static $preg_ec = array();
-
-		if (empty($preg_ec))
+		if (empty($this->_preg_escape_char))
 		{
 			if (is_array($this->_escape_char))
 			{
-				$preg_ec = array(
+				$this->_preg_escape_char = array(
 					preg_quote($this->_escape_char[0], '/'),
 					preg_quote($this->_escape_char[1], '/'),
 					$this->_escape_char[0],
@@ -1430,8 +1442,8 @@ abstract class CI_DB_driver {
 			}
 			else
 			{
-				$preg_ec[0] = $preg_ec[1] = preg_quote($this->_escape_char, '/');
-				$preg_ec[2] = $preg_ec[3] = $this->_escape_char;
+				$this->_preg_escape_char[0] = $this->_preg_escape_char[1] = preg_quote($this->_escape_char, '/');
+				$this->_preg_escape_char[2] = $this->_preg_escape_char[3] = $this->_escape_char;
 			}
 		}
 
@@ -1439,11 +1451,11 @@ abstract class CI_DB_driver {
 		{
 			if (strpos($item, '.'.$id) !== FALSE)
 			{
-				return preg_replace('/'.$preg_ec[0].'?([^'.$preg_ec[1].'\.]+)'.$preg_ec[1].'?\./i', $preg_ec[2].'$1'.$preg_ec[3].'.', $item);
+				return preg_replace('/'.$this->_preg_escape_char[0].'?([^'.$this->_preg_escape_char[1].'\.]+)'.$this->_preg_escape_char[1].'?\./i', $this->_preg_escape_char[2].'$1'.$this->_preg_escape_char[3].'.', $item);
 			}
 		}
 
-		return preg_replace('/'.$preg_ec[0].'?([^'.$preg_ec[1].'\.]+)'.$preg_ec[1].'?(\.)?/i', $preg_ec[2].'$1'.$preg_ec[3].'$2', $item);
+		return preg_replace('/'.$this->_preg_escape_char[0].'?([^'.$this->_preg_escape_char[1].'\.]+)'.$this->_preg_escape_char[1].'?(\.)?/i', $this->_preg_escape_char[2].'$1'.$this->_preg_escape_char[3].'$2', $item);
 	}
 
 	// --------------------------------------------------------------------
@@ -1562,14 +1574,12 @@ abstract class CI_DB_driver {
 	 */
 	protected function _get_operator($str)
 	{
-		static $_operators;
-
-		if (empty($_operators))
+		if (empty($this->_preg_operators))
 		{
 			$_les = ($this->_like_escape_str !== '')
 				? '\s+'.preg_quote(trim(sprintf($this->_like_escape_str, $this->_like_escape_chr)), '/')
 				: '';
-			$_operators = array(
+			$this->_preg_operators = array(
 				'\s*(?:<|>|!)?=\s*',             // =, <=, >=, !=
 				'\s*<>?\s*',                     // <, <>
 				'\s*>\s*',                       // >
@@ -1587,7 +1597,7 @@ abstract class CI_DB_driver {
 
 		}
 
-		return preg_match('/'.implode('|', $_operators).'/i', $str, $match)
+		return preg_match('/'.implode('|', $this->_preg_operators).'/i', $str, $match)
 			? $match[0] : FALSE;
 	}
 

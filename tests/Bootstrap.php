@@ -45,7 +45,7 @@ ini_set('default_charset', 'UTF-8');
 if (extension_loaded('mbstring'))
 {
 	defined('MB_ENABLED') OR define('MB_ENABLED', TRUE);
-	@ini_set('mbstring.internal_encoding', 'UTF-8');
+//	@ini_set('mbstring.internal_encoding', 'UTF-8');
 	mb_substitute_character('none');
 }
 else
@@ -56,14 +56,12 @@ else
 if (extension_loaded('iconv'))
 {
 	defined('ICONV_ENABLED') OR define('ICONV_ENABLED', TRUE);
-	@ini_set('iconv.internal_encoding', 'UTF-8');
+	//@ini_set('iconv.internal_encoding', 'UTF-8');
 }
 else
 {
 	defined('ICONV_ENABLED') OR define('ICONV_ENABLED', FALSE);
 }
-
-is_php('5.6') && ini_set('php.internal_encoding', 'UTF-8');
 
 if (is_php('7.0'))
 {

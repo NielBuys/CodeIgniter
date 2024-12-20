@@ -395,10 +395,10 @@ class CI_Session {
         // We force the PHP defaults.
         if (PHP_VERSION_ID < 90000) {
             if ($bits_per_character !== 4) {
-                ini_set('session.sid_bits_per_character', '4');
+                @ini_set('session.sid_bits_per_character', '4');
             }
             if ($sid_length !== 32) {
-                ini_set('session.sid_length', '32');
+                @ini_set('session.sid_length', '32');
             }
         }
 

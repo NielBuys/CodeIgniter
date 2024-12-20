@@ -267,16 +267,11 @@ if ( ! is_php('5.4'))
 		define('ICONV_ENABLED', TRUE);
 		// iconv.internal_encoding is deprecated starting with PHP 5.6
 		// and it's usage triggers E_DEPRECATED messages.
-		@ini_set('iconv.internal_encoding', $charset);
+		// @ini_set('iconv.internal_encoding', $charset);
 	}
 	else
 	{
 		define('ICONV_ENABLED', FALSE);
-	}
-
-	if (is_php('5.6'))
-	{
-		ini_set('php.internal_encoding', $charset);
 	}
 
 /*

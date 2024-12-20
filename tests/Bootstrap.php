@@ -45,7 +45,7 @@ ini_set('default_charset', 'UTF-8');
 if (extension_loaded('mbstring'))
 {
 	defined('MB_ENABLED') OR define('MB_ENABLED', TRUE);
-	@ini_set('mbstring.internal_encoding', 'UTF-8');
+//	@ini_set('mbstring.internal_encoding', 'UTF-8');
 	mb_substitute_character('none');
 }
 else

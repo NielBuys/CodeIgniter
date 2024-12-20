@@ -250,7 +250,7 @@ if ( ! is_php('5.4'))
 		define('MB_ENABLED', TRUE);
 		// mbstring.internal_encoding is deprecated starting with PHP 5.6
 		// and it's usage triggers E_DEPRECATED messages.
-		@ini_set('mbstring.internal_encoding', $charset);
+	//	@ini_set('mbstring.internal_encoding', $charset);
 		// This is required for mb_convert_encoding() to strip invalid characters.
 		// That's utilized by CI_Utf8, but it's also done for consistency with iconv.
 		mb_substitute_character('none');

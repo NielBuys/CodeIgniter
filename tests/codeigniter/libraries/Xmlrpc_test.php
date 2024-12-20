@@ -12,7 +12,7 @@ class Xmlrpc_test extends CI_TestCase {
 	//	$this->input = new CI_Input($security);
 		$utf8 = new Mock_Core_Utf8();
 		$security = new Mock_Core_Security();
-		$this->$input = new Mock_Core_Input($security, $utf8);
+		$this->input = new Mock_Core_Input($security, $utf8);
 
 		$this->input_lib_raw_stream = new ReflectionProperty($this->input, '_raw_input_stream');
 		$this->input_lib_raw_stream->setAccessible(TRUE);

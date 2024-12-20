@@ -9,7 +9,7 @@
 	stopOnIncomplete="false"
 	stopOnSkipped="false"
 	beStrictAboutTestsThatDoNotTestAnything="false"
-	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
 >
   <coverage includeUncoveredFiles="false">
     <include>

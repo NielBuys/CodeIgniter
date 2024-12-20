@@ -232,21 +232,22 @@ class CI_Xmlrpcs extends CI_Xmlrpc {
 		//  Set up XML Parser
 		//-------------------------------------
 
-		$parser = xml_parser_create($this->xmlrpc_defencoding);
-		$parser_object = new XML_RPC_Message('filler');
+        $parser = xml_parser_create($this->xmlrpc_defencoding);
+        $parser_object = new XML_RPC_Message('default_method', FALSE);
 
-		$parser_object->xh = array(
-			'isf' => 0,
-			'isf_reason' => '',
-			'params' => array(),
-			'stack' => array(),
-			'valuestack' => array(),
-			'method' => ''
-		);
+        $parser_object->xh = array(
+            'isf' => 0,
+            'isf_reason' => '',
+            'params' => array(),
+            'stack' => array(),
+            'valuestack' => array(),
+            'method' => ''
+        );
 
         xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
-        xml_set_element_handler($parser, [$this, 'open_tag'], [$this, 'closing_tag']);
-        xml_set_character_data_handler($parser, [$this, 'character_data']);
+        xml_set_element_handler($parser, [$parser_object, 'open_tag'], [$parser_object, 'closing_tag']);
+        xml_set_character_data_handler($parser, [$parser_object, 'character_data']);
+
 		//xml_set_default_handler($parser, 'default_handler');
 
 		//-------------------------------------

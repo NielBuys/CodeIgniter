@@ -20,7 +20,7 @@
 	"scripts": {
 		"test:coverage": [
 			"@putenv XDEBUG_MODE=coverage",
-			"phpunit --color=always --coverage-text --configuration tests/travis/sqlite.phpunit.xml"
+			"phpunit --color=always --coverage-text --configuration tests/phpunit.xml"
 		],
 		"post-install-cmd": [
 			"sed -i s/name{0}/name[0]/ vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php"

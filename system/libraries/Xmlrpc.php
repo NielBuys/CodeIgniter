@@ -1152,20 +1152,19 @@ class XML_RPC_Message extends CI_Xmlrpc
 		// Create and Set Up XML Parser
 		//-------------------------------------
 
-		$parser = xml_parser_create($this->xmlrpc_defencoding);
-		$this->xh = array(
-			'isf'		=> 0,
-			'ac'		=> '',
-			'headers'	=> array(),
-			'stack'		=> array(),
-			'valuestack'	=> array(),
-			'isf_reason'	=> 0
-		);
+        $parser = xml_parser_create($this->xmlrpc_defencoding);
+        $this->xh = array(
+            'isf' => 0,
+            'ac' => '',
+            'headers' => array(),
+            'stack' => array(),
+            'valuestack' => array(),
+            'isf_reason' => 0
+        );
 
         xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, true);
         xml_set_element_handler($parser, [$this, 'open_tag'], [$this, 'closing_tag']);
         xml_set_character_data_handler($parser, [$this, 'character_data']);
-
 		//xml_set_default_handler($parser, 'default_handler');
 
 		// Get headers

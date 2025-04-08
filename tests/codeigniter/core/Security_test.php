@@ -64,11 +64,20 @@ class Security_test extends CI_TestCase {
 
 	public function test_xss_clean()
 	{
+		// Test case 1: Injecting a harmful script
 		$harm_string = "Hello, i try to <script>alert('Hack');</script> your site";
-
 		$harmless_string = $this->security->xss_clean($harm_string);
-
 		$this->assertEquals("Hello, i try to [removed]alert&#40;'Hack'&#41;;[removed] your site", $harmless_string);
+
+		// Test case 2: Make sure "60% acqua" is preserved (check if % encoding is not altered)
+		$input_string = "60% acqua";
+		$preserved_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("60% acqua", $preserved_string);
+
+		// Test case 3: Ensure URL-encoded string is decoded properly ("http://%77..." → "http://w...")
+		$url_string = "http://%77ww.example.com";
+		$decoded_url_string = $this->security->xss_clean($url_string);
+		$this->assertEquals("http://www.example.com", $decoded_url_string);
 	}
 
 	// --------------------------------------------------------------------
@@ -352,5 +361,45 @@ class Security_test extends CI_TestCase {
 		$this->security = new Mock_Core_Security();
 
 		$this->assertNotEmpty($this->security->get_csrf_hash());
+	}
+
+	public function test_xss_clean_multiple_percent_encoding()
+	{
+		// Multiple encoded characters
+		$input_string = "This is a test with %20spaces, %21exclamation and %3Fquestion mark.";
+		$output_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("This is a test with  spaces, !exclamation and ?question mark.", $output_string);
+	}
+
+	public function test_xss_clean_double_encoded_percent()
+	{
+		// Double-encoded characters (e.g., %25 = '%')
+		$input_string = "This is a double encoded %25 percent symbol.";
+		$output_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("This is a double encoded % percent symbol.", $output_string);
+	}
+
+	public function test_xss_clean_case_sensitive_percent_encoding()
+	{
+		// Uppercase and lowercase hex encoding
+		$input_string = "Hex encoded characters: %7A, %7a, %41, %61.";
+		$output_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("Hex encoded characters: z, z, A, a.", $output_string);
+	}
+
+	public function test_xss_clean_non_alphanumeric_encoding()
+	{
+		// Non-alphanumeric characters encoded
+		$input_string = "Symbols like %40at, %23hash, and %24dollar are encoded.";
+		$output_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("Symbols like @at, #hash, and $dollar are encoded.", $output_string);
+	}
+
+	public function test_xss_clean_multiple_encoded_sequences()
+	{
+		// Multiple encodings in sequence
+		$input_string = "This is a test string with %20spaces and %23hashes multiple times: %20 and %23.";
+		$output_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("This is a test string with spaces and #hashes multiple times:  and #.", $output_string);
 	}
 }

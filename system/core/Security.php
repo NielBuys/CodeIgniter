@@ -398,8 +398,7 @@ class CI_Security {
 		 *
 		 * Note: Use rawurldecode() so it does not remove plus signs
 		 */
-		if (stripos($str, '%') !== false)
-		{
+		if (preg_match_all('/%[0-9a-fA-F]{2}/', $str, $matches) && count($matches[0]) > 1) {
 			do
 			{
 				$oldstr = $str;

@@ -398,20 +398,32 @@ class CI_Security {
 		 *
 		 * Note: Use rawurldecode() so it does not remove plus signs
 		 */
-		if (preg_match_all('/%[0-9a-fA-F]{2}/', $str, $matches) && count($matches[0]) > 1) {
-			do {
-				$oldstr = $str;
-				
-				$str = rawurldecode($str);
-				
-				$str = preg_replace_callback('#%(?:\s*[0-9a-f]){2,}#i', array($this, '_urldecodespaces'), $str);
+		// List of known malicious encoded patterns (hexadecimal)
+		$malicious_encodings = [
+			'%3C' => '<',  // <
+			'%3E' => '>',  // >
+			'%22' => '"',  // "
+			'%27' => "'",  // '
+			'%3D' => '=',  // =
+			'%28' => '(',  // (
+			'%29' => ')',  // )
+			'%2F' => '/',  // /
+			'%5C' => '\\', // \
+			'%3B' => ';',  // ;
+		];
 
-			} while ($oldstr !== $str);
-			unset($oldstr);
-		}
-
-		$str = preg_replace_callback('/%[0-9a-fA-F]{2}/', function($matches) {
-			return chr(hexdec(substr($matches[0], 1, 2)));  // Convert %XX to its corresponding character
+		// Normalize optionally spaced encodings like "% 3C"
+		$str = preg_replace_callback('/%[\s]*[0-9a-fA-F]{2}/', function ($m) use ($malicious_encodings) {
+			// Normalize encoding: remove spaces
+			$clean = strtoupper(preg_replace('/\s+/', '', $m[0]));  // e.g., "% 3C" → "%3C"
+			
+			// If the encoding is a known malicious encoding, replace it
+			if (isset($malicious_encodings[$clean])) {
+				return $malicious_encodings[$clean];
+			}
+			
+			// Return as-is if not malicious (e.g., malformed encodings like %2G, %3)
+			return $m[0];
 		}, $str);
 
 		/*
@@ -814,24 +826,6 @@ class CI_Security {
 			'\\2',
 			$str
 		);
-	}
-
-	// ----------------------------------------------------------------
-
-	/**
-	 * URL-decode taking spaces into account
-	 *
-	 * @see		https://github.com/bcit-ci/CodeIgniter/issues/4877
-	 * @param	array	$matches
-	 * @return	string
-	 */
-	protected function _urldecodespaces($matches)
-	{
-		$input    = $matches[0];
-		$nospaces = preg_replace('#\s+#', '', $input);
-		return ($nospaces === $input)
-			? $input
-			: rawurldecode($nospaces);
 	}
 
 	// ----------------------------------------------------------------

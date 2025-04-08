@@ -88,3 +88,7 @@ If you are using command-line you can do the following:
 3. `git push origin develop`
 
 Now your fork is up to date. This should be done regularly, or before you send a pull request at least.
+
+## PHP Unit test command
+1. `composer install --dev`
+2. `./vendor/bin/phpunit --color=always --coverage-text --configuration tests/phpunit.xml`

@@ -385,10 +385,9 @@ class Security_test extends CI_TestCase {
 	public function test_xss_clean_non_alphanumeric_encoding()
 	{
 		// Non-alphanumeric characters encoded
-		$dollar = '$';
 		$input_string = "Symbols like %40at, %23hash, and %24dollar are encoded.";
 		$output_string = $this->security->xss_clean($input_string);
-		$this->assertEquals("Symbols like @at, #hash, and $dollar are encoded.", $output_string);
+		$this->assertEquals("Symbols like @at, #hash, and \$dollar are encoded.", $output_string);
 	}
 
 	public function test_xss_clean_multiple_encoded_sequences()
@@ -396,6 +395,6 @@ class Security_test extends CI_TestCase {
 		// Multiple encodings in sequence
 		$input_string = "This is a test string with %20spaces and %23hashes multiple times: %20 and %23.";
 		$output_string = $this->security->xss_clean($input_string);
-		$this->assertEquals("This is a test string with spaces and #hashes multiple times:  and #.", $output_string);
+		$this->assertEquals("This is a test string with  spaces and #hashes multiple times:   and #.", $output_string);
 	}
 }

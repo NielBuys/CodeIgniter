@@ -402,20 +402,17 @@ class CI_Security {
 			do {
 				$oldstr = $str;
 				
-				// Decode percent-encoded characters like %77, %20, etc.
-				$str = preg_replace_callback(
-					'/%[0-9a-fA-F]{2}/', 
-					function ($matches) {
-						return rawurldecode($matches[0]); // Decode the percent-encoded character
-					},
-					$str
-				);
+				$str = rawurldecode($str);
 				
-				// Continue applying the rest of the decoding logic for other sequences if necessary
 				$str = preg_replace_callback('#%(?:\s*[0-9a-f]){2,}#i', array($this, '_urldecodespaces'), $str);
+
 			} while ($oldstr !== $str);
 			unset($oldstr);
 		}
+
+		$str = preg_replace_callback('/%[0-9a-fA-F]{2}/', function($matches) {
+			return chr(hexdec(substr($matches[0], 1, 2)));  // Convert %XX to its corresponding character
+		}, $str);
 
 		/*
 		 * Convert character entities to ASCII

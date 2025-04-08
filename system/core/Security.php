@@ -399,13 +399,21 @@ class CI_Security {
 		 * Note: Use rawurldecode() so it does not remove plus signs
 		 */
 		if (preg_match_all('/%[0-9a-fA-F]{2}/', $str, $matches) && count($matches[0]) > 1) {
-			do
-			{
+			do {
 				$oldstr = $str;
-				$str = rawurldecode($str);
+				
+				// Decode percent-encoded characters like %77, %20, etc.
+				$str = preg_replace_callback(
+					'/%[0-9a-fA-F]{2}/', 
+					function ($matches) {
+						return rawurldecode($matches[0]); // Decode the percent-encoded character
+					},
+					$str
+				);
+				
+				// Continue applying the rest of the decoding logic for other sequences if necessary
 				$str = preg_replace_callback('#%(?:\s*[0-9a-f]){2,}#i', array($this, '_urldecodespaces'), $str);
-			}
-			while ($oldstr !== $str);
+			} while ($oldstr !== $str);
 			unset($oldstr);
 		}
 

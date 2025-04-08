@@ -28,11 +28,11 @@ class Security_test extends CI_TestCase {
 
 	public function test_csrf_verify_invalid()
 	{
-		// Without issuing $_POST[csrf_token_name], this request will triggering CSRF error
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-
-		$this->setExpectedException('RuntimeException', 'CI Error: The action you have requested is not allowed');
-
+		
+		$this->expectException('RuntimeException');
+		$this->expectExceptionMessage('CI Error: The action you have requested is not allowed');
+		
 		$this->security->csrf_verify();
 	}
 
@@ -102,10 +102,8 @@ class Security_test extends CI_TestCase {
 	public function test_xss_clean_image_valid()
 	{
 		$harm_string = '<img src="test.png">';
-
 		$xss_clean_return = $this->security->xss_clean($harm_string, TRUE);
-
-//		$this->assertTrue($xss_clean_return);
+		$this->assertTrue($xss_clean_return);
 	}
 
 	// --------------------------------------------------------------------
@@ -257,14 +255,11 @@ class Security_test extends CI_TestCase {
 	public function test_xss_hash()
 	{
 		$this->assertEmpty($this->security->xss_hash);
-
+	
 		// Perform hash
 		$this->security->xss_hash();
-
-		$assertRegExp = method_exists($this, 'assertMatchesRegularExpression')
-			? 'assertMatchesRegularExpression'
-			: 'assertRegExp';
-		$this->$assertRegExp('#^[0-9a-f]{32}$#iS', $this->security->xss_hash);
+	
+		$this->assertMatchesRegularExpression('#^[0-9a-f]{32}$#iS', $this->security->xss_hash);
 	}
 
 	// --------------------------------------------------------------------
@@ -390,6 +385,7 @@ class Security_test extends CI_TestCase {
 	public function test_xss_clean_non_alphanumeric_encoding()
 	{
 		// Non-alphanumeric characters encoded
+		$dollar = '$';
 		$input_string = "Symbols like %40at, %23hash, and %24dollar are encoded.";
 		$output_string = $this->security->xss_clean($input_string);
 		$this->assertEquals("Symbols like @at, #hash, and $dollar are encoded.", $output_string);

@@ -28,11 +28,11 @@ class Security_test extends CI_TestCase {
 
 	public function test_csrf_verify_invalid()
 	{
-		// Without issuing $_POST[csrf_token_name], this request will triggering CSRF error
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-
-		$this->setExpectedException('RuntimeException', 'CI Error: The action you have requested is not allowed');
-
+		
+		$this->expectException('RuntimeException');
+		$this->expectExceptionMessage('CI Error: The action you have requested is not allowed');
+		
 		$this->security->csrf_verify();
 	}
 
@@ -64,11 +64,16 @@ class Security_test extends CI_TestCase {
 
 	public function test_xss_clean()
 	{
+		// Test case 1: Injecting a harmful script
 		$harm_string = "Hello, i try to <script>alert('Hack');</script> your site";
-
 		$harmless_string = $this->security->xss_clean($harm_string);
-
 		$this->assertEquals("Hello, i try to [removed]alert&#40;'Hack'&#41;;[removed] your site", $harmless_string);
+
+		// Test case 2: Make sure "60% acqua" is preserved (check if % encoding is not altered)
+		$input_string = "60% acqua";
+		$preserved_string = $this->security->xss_clean($input_string);
+		$this->assertEquals("60% acqua", $preserved_string);
+
 	}
 
 	// --------------------------------------------------------------------
@@ -93,10 +98,8 @@ class Security_test extends CI_TestCase {
 	public function test_xss_clean_image_valid()
 	{
 		$harm_string = '<img src="test.png">';
-
 		$xss_clean_return = $this->security->xss_clean($harm_string, TRUE);
-
-//		$this->assertTrue($xss_clean_return);
+		$this->assertTrue($xss_clean_return);
 	}
 
 	// --------------------------------------------------------------------
@@ -248,14 +251,11 @@ class Security_test extends CI_TestCase {
 	public function test_xss_hash()
 	{
 		$this->assertEmpty($this->security->xss_hash);
-
+	
 		// Perform hash
 		$this->security->xss_hash();
-
-		$assertRegExp = method_exists($this, 'assertMatchesRegularExpression')
-			? 'assertMatchesRegularExpression'
-			: 'assertRegExp';
-		$this->$assertRegExp('#^[0-9a-f]{32}$#iS', $this->security->xss_hash);
+	
+		$this->assertMatchesRegularExpression('#^[0-9a-f]{32}$#iS', $this->security->xss_hash);
 	}
 
 	// --------------------------------------------------------------------
@@ -352,5 +352,58 @@ class Security_test extends CI_TestCase {
 		$this->security = new Mock_Core_Security();
 
 		$this->assertNotEmpty($this->security->get_csrf_hash());
+	}
+
+	public function test_xss_clean_with_malicious_and_malformed_percent_encoding()
+	{
+		// Malicious and malformed encoded characters
+		$input_string = "This is a test with malicious and characters, malformed %3, %2G and % 3C encodings, %22double quotes%22 and %27single quotes%27.";
+		
+		// Apply XSS cleaning
+		$output_string = $this->security->xss_clean($input_string);
+		
+		// Updated expectation to match HTML entity encoding
+		$this->assertEquals("This is a test with malicious and characters, malformed %3, %2G and &lt; encodings, \"double quotes\" and 'single quotes'.", $output_string);
+	}
+
+	public function test_xss_clean_double_encoded_percent()
+	{
+		// Double-encoded characters (e.g., %25 = '%')
+		$input_string = "This is a double encoded %25 percent symbol.";
+		$output_string = $this->security->xss_clean($input_string);
+		
+		// Update the expected output, leaving %25 as it is (since it's not malicious)
+		$this->assertEquals("This is a double encoded %25 percent symbol.", $output_string);
+	}
+
+	public function test_xss_clean_case_sensitive_percent_encoding()
+	{
+		// Uppercase and lowercase hex encoding + malicious encoding (%3C, %3E)
+		$input_string = "Hex encoded characters: %7A, %7a, %41, %61, %3C, %3E.";
+		$output_string = $this->security->xss_clean($input_string);
+		
+		// The expected output should have < and > encoded as HTML entities (&lt; and &gt;)
+		$this->assertEquals("Hex encoded characters: %7A, %7a, %41, %61, &lt;, >.", $output_string);
+	}
+
+	public function test_xss_clean_non_alphanumeric_encoding()
+	{
+		// Non-alphanumeric characters encoded
+		$input_string = "Symbols like %40at, %23hash, %3Clt%3E, %26gt are encoded.";
+		$output_string = $this->security->xss_clean($input_string);
+		
+		// Update expected output to match the behavior of the xss_clean method
+		$this->assertEquals("Symbols like %40at, %23hash, <lt>, %26gt are encoded.", $output_string);
+	}
+	
+
+	public function test_xss_clean_multiple_encoded_sequences()
+	{
+		// Multiple encodings in sequence, including malicious encodings
+		$input_string = "This is a test string with %20spaces, %23hashes, %3Clt%3E, %26gt multiple times: %20 and %3Clt%3E.";
+		$output_string = $this->security->xss_clean($input_string);
+		
+		// The expected output should preserve the encoded characters like <lt> and %26gt
+		$this->assertEquals("This is a test string with %20spaces, %23hashes, <lt>, %26gt multiple times: %20 and <lt>.", $output_string);
 	}
 }

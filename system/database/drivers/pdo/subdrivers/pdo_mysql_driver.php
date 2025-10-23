@@ -123,6 +123,26 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
+		if (PHP_VERSION_ID >= 80100) {
+			$ATTR_INIT_COMMAND = \Pdo\Mysql::ATTR_INIT_COMMAND;
+			$ATTR_COMPRESS = \Pdo\Mysql::ATTR_COMPRESS;
+			$ATTR_SSL_KEY = \Pdo\Mysql::ATTR_SSL_KEY;
+			$ATTR_SSL_CERT = \Pdo\Mysql::ATTR_SSL_CERT;
+			$ATTR_SSL_CA = \Pdo\Mysql::ATTR_SSL_CA;
+			$ATTR_SSL_CAPATH = \Pdo\Mysql::ATTR_SSL_CAPATH;
+			$ATTR_SSL_CIPHER = \Pdo\Mysql::ATTR_SSL_CIPHER;
+			$ATTR_SSL_VERIFY_SERVER_CERT = \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT;
+		} else {
+			$ATTR_INIT_COMMAND = \PDO::MYSQL_ATTR_INIT_COMMAND;
+			$ATTR_COMPRESS = \PDO::MYSQL_ATTR_COMPRESS;
+			$ATTR_SSL_KEY = \PDO::MYSQL_ATTR_SSL_KEY;
+			$ATTR_SSL_CERT = \PDO::MYSQL_ATTR_SSL_CERT;
+			$ATTR_SSL_CA = \PDO::MYSQL_ATTR_SSL_CA;
+			$ATTR_SSL_CAPATH = \PDO::MYSQL_ATTR_SSL_CAPATH;
+			$ATTR_SSL_CIPHER = \PDO::MYSQL_ATTR_SSL_CIPHER;
+			$ATTR_SSL_VERIFY_SERVER_CERT = \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
+		}
+
 		if (isset($this->stricton))
 		{
 			if ($this->stricton)
@@ -143,34 +163,34 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 
 			if ( ! empty($sql))
 			{
-				if (empty($this->options[PDO::MYSQL_ATTR_INIT_COMMAND]))
+				if (empty($this->options[$ATTR_INIT_COMMAND]))
 				{
-					$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET SESSION sql_mode = '.$sql;
+					$this->options[$ATTR_INIT_COMMAND] = 'SET SESSION sql_mode = '.$sql;
 				}
 				else
 				{
-					$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ', @@session.sql_mode = '.$sql;
+					$this->options[$ATTR_INIT_COMMAND] .= ', @@session.sql_mode = '.$sql;
 				}
 			}
 		}
 
 		if ($this->compress === TRUE)
 		{
-			$this->options[PDO::MYSQL_ATTR_COMPRESS] = TRUE;
+			$this->options[$ATTR_COMPRESS] = TRUE;
 		}
 
 		if (is_array($this->encrypt))
 		{
 			$ssl = array();
-			empty($this->encrypt['ssl_key'])    OR $ssl[PDO::MYSQL_ATTR_SSL_KEY]    = $this->encrypt['ssl_key'];
-			empty($this->encrypt['ssl_cert'])   OR $ssl[PDO::MYSQL_ATTR_SSL_CERT]   = $this->encrypt['ssl_cert'];
-			empty($this->encrypt['ssl_ca'])     OR $ssl[PDO::MYSQL_ATTR_SSL_CA]     = $this->encrypt['ssl_ca'];
-			empty($this->encrypt['ssl_capath']) OR $ssl[PDO::MYSQL_ATTR_SSL_CAPATH] = $this->encrypt['ssl_capath'];
-			empty($this->encrypt['ssl_cipher']) OR $ssl[PDO::MYSQL_ATTR_SSL_CIPHER] = $this->encrypt['ssl_cipher'];
+			empty($this->encrypt['ssl_key'])    OR $ssl[$ATTR_SSL_KEY]    = $this->encrypt['ssl_key'];
+			empty($this->encrypt['ssl_cert'])   OR $ssl[$ATTR_SSL_CERT]   = $this->encrypt['ssl_cert'];
+			empty($this->encrypt['ssl_ca'])     OR $ssl[$ATTR_SSL_CA]     = $this->encrypt['ssl_ca'];
+			empty($this->encrypt['ssl_capath']) OR $ssl[$ATTR_SSL_CAPATH] = $this->encrypt['ssl_capath'];
+			empty($this->encrypt['ssl_cipher']) OR $ssl[$ATTR_SSL_CIPHER] = $this->encrypt['ssl_cipher'];
 
-			if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT') && isset($this->encrypt['ssl_verify']))
+			if (defined($ATTR_SSL_VERIFY_SERVER_CERT) && isset($this->encrypt['ssl_verify']))
 			{
-				$ssl[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $this->encrypt['ssl_verify'];
+				$ssl[$ATTR_SSL_VERIFY_SERVER_CERT] = $this->encrypt['ssl_verify'];
 			}
 
 			// DO NOT use array_merge() here!

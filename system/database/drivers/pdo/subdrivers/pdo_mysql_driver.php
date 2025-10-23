@@ -123,7 +123,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
-		if (PHP_VERSION_ID >= 80100) {
+		if (PHP_VERSION_ID >= 80400) {
 			$ATTR_INIT_COMMAND = \Pdo\Mysql::ATTR_INIT_COMMAND;
 			$ATTR_COMPRESS = \Pdo\Mysql::ATTR_COMPRESS;
 			$ATTR_SSL_KEY = \Pdo\Mysql::ATTR_SSL_KEY;

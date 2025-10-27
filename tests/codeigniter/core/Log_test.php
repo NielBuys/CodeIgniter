@@ -4,17 +4,29 @@ class Log_test extends CI_TestCase {
 	public function test_configuration()
 	{
 		$path       = new ReflectionProperty('CI_Log', '_log_path');
-		$path->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$path->setAccessible(TRUE);
+		}
 		$threshold  = new ReflectionProperty('CI_Log', '_threshold');
-		$threshold->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$threshold->setAccessible(TRUE);
+		}
 		$date_fmt   = new ReflectionProperty('CI_Log', '_date_fmt');
-		$date_fmt->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$date_fmt->setAccessible(TRUE);
+		}
 		$file_ext   = new ReflectionProperty('CI_Log', '_file_ext');
-		$file_ext->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$file_ext->setAccessible(TRUE);
+		}
 		$file_perms = new ReflectionProperty('CI_Log', '_file_permissions');
-		$file_perms->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$file_perms->setAccessible(TRUE);
+		}
 		$enabled    = new ReflectionProperty('CI_Log', '_enabled');
-		$enabled->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$enabled->setAccessible(TRUE);
+		}
 
 		$this->ci_set_config('log_path', '/root/');
 		$this->ci_set_config('log_threshold', 'z');

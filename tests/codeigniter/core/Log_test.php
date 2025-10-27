@@ -66,7 +66,9 @@ class Log_test extends CI_TestCase {
 		$instance = new CI_Log();
 
 		$format_line = new ReflectionMethod($instance, '_format_line');
-		$format_line->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$format_line->setAccessible(TRUE);
+		}
 		$this->assertEquals(
 			$format_line->invoke($instance, 'LEVEL', 'Timestamp', 'Message'),
 			"LEVEL - Timestamp --> Message".PHP_EOL

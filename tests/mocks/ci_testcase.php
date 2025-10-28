@@ -35,6 +35,12 @@ class CI_TestCase extends \PHPUnit\Framework\TestCase {
 
 	public function setUp()
 	{
+        // 1. MANDATORY: Call the parent method first (Required by PHPUnit 10+)
+        parent::setUp(); 
+
+        // 2. LOGIC FROM runBare(): Set the global CI test instance
+        self::$ci_test_instance = $this;
+
 		// Setup VFS with base directories
 		$this->ci_vfs_root = vfsStream::setup('');
 		$this->ci_app_root = vfsStream::newDirectory('application')->at($this->ci_vfs_root);
@@ -335,23 +341,6 @@ class CI_TestCase extends \PHPUnit\Framework\TestCase {
 
 	// --------------------------------------------------------------------
 	// Internals
-	// --------------------------------------------------------------------
-
-	/**
-	 * Overwrite runBare
-	 *
-	 * PHPUnit instantiates the test classes before
-	 * running them individually. So right before a test
-	 * runs we set our instance. Normally this step would
-	 * happen in setUp, but someone is bound to forget to
-	 * call the parent method and debugging this is no fun.
-	 */
-	public function runBare()
-	{
-		self::$ci_test_instance = $this;
-		parent::runBare();
-	}
-
 	// --------------------------------------------------------------------
 
 	public function helper($name)

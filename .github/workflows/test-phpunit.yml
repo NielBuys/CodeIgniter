@@ -161,7 +161,7 @@ jobs:
           tools: composer, pecl
           extensions: imagick, sqlite3, pgsql, mysqli, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite, mbstring
           ini-values: ${{ env.PHP_INI_VALUES }}
-          coverage: xdebug
+          coverage: pcov # CHANGED from 'xdebug' to 'pcov'
 
       - name: Get composer cache directory
         id: composer-cache
@@ -171,12 +171,20 @@ jobs:
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-   
+          restore-keys: ${{ runner.os }}-composer- 
+
+      # --- CRUCIAL NEW STEP WITH CORRECT INDENTATION ---
+      - name: Conditionally Lock PHPUnit 9 for older PHP versions
+        if: matrix.php == '7.4' || matrix.php == '8.0'
+        # This command updates the dependency in composer.json/lock without installing.
+        run: composer require --dev --no-update "phpunit/phpunit:^9.0"
+
+      # --- VITAL MISSING STEP RE-ADDED ---
       - name: Install composer dependencies
+        # This runs the actual install after the lock/update (if any)
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: PHPUnit Test
         run: |
           php -d error_reporting=E_ALL -d zend.enable_gc=0 -d date.timezone=UTC vendor/bin/phpunit --coverage-text --configuration tests/travis/${{ matrix.DB }}.phpunit.xml
-        env:
-          XDEBUG_MODE: coverage
+        # REMOVED env: XDEBUG_MODE: coverage

@@ -185,15 +185,21 @@ jobs:
 
       - name: PHPUnit Test
         run: |
+          # 1. Determine the configuration file based on PHP version
           # Use the _v9 config file for older PHPUnit versions (PHP 7.4 & 8.0)
           if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ]; then
             CONFIG_FILE="tests/travis/${{ matrix.DB }}.phpunit_v9.xml"
+            STRICT_FLAGS="" # V9 files handle strictness via XML attributes
           else
             # Use the modern config file for PHPUnit 10/11 (PHP 8.1+)
             CONFIG_FILE="tests/travis/${{ matrix.DB }}.phpunit.xml"
+            # Explicitly add flags to force failure on PHP Warnings/Notices, 
+            # as the XML schema doesn't allow the modern equivalent tags.
+            STRICT_FLAGS="--fail-on-warning --fail-on-notice"
           fi
 
-          # 3. Execute PHPUnit with dynamic configuration and flags
+          # 2. Execute PHPUnit with dynamic configuration and flags
           php -d error_reporting=E_ALL -d zend.enable_gc=0 -d date.timezone=UTC vendor/bin/phpunit \
               --coverage-text \
-              --configuration ${CONFIG_FILE}
+              --configuration ${CONFIG_FILE} \
+              ${STRICT_FLAGS}

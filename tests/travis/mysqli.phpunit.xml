@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit 
-	bootstrap="../Bootstrap.php"
-	colors="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	stopOnError="false"
-	stopOnFailure="false"
-	stopOnIncomplete="false"
-	stopOnSkipped="false"
-	beStrictAboutTestsThatDoNotTestAnything="false">
-	<php>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+    bootstrap="../Bootstrap.php"
+    colors="true"
+    stopOnError="false"
+    stopOnFailure="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    beStrictAboutTestsThatDoNotTestAnything="false">
+    <php>
         <const name="DB_DRIVER" value="mysqli"/>
     </php>
-	<testsuites>
-		<testsuite name="CodeIgniter Core Test Suite">
-			<directory suffix="test.php">../codeigniter</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-        <whitelist addUncoveredFilesFromWhitelist="false">
+    <testsuites>
+        <testsuite name="CodeIgniter Core Test Suite">
+            <directory suffix="test.php">../codeigniter</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <!-- The CodeIgniter system files and your application files (or wherever your code lives) -->
+        <include>
             <directory suffix=".php">../../system</directory>
-        </whitelist>
-	</filter>
+            <directory suffix=".php">../../application</directory>
+        </include>
+        <exclude>
+            <!-- Exclude test files, which should not be covered by other tests -->
+            <directory>../../tests</directory>
+        </exclude>
+    </source>
 </phpunit>

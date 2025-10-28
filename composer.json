@@ -4,11 +4,6 @@
 	"type": "project",
 	"homepage": "https://github.com/NielBuys/CodeIgniter",
 	"license": "MIT",
-    "config": {
-        "platform": {
-            "php": "7.4"
-        }
-    },
 	"support": {
 		"forum": "http://forum.codeigniter.com/",
 		"issues": "https://github.com/NielBuys/CodeIgniter/issues",

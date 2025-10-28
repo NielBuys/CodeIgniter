@@ -1,6 +1,6 @@
-# Contributing to CodeIgniter
+# Contributing to this Fork of CodeIgniter 3
 
-CodeIgniter is a community driven project and accepts contributions of code and documentation from the community. These contributions are made in the form of Issues or [Pull Requests](http://help.github.com/send-pull-requests/) on the [CodeIgniter repository](https://github.com/bcit-ci/CodeIgniter) on GitHub.
+CodeIgniter is a community driven project and accepts contributions of code and documentation from the community. These contributions are made in the form of Issues or Pull Requests on the [Fork of CodeIgniter 3 repository](https://github.com/NielBuys/CodeIgniter) on GitHub.
 
 Issues are a quick way to point out a bug. If you find a bug or documentation error in CodeIgniter then please check a few things first:
 
@@ -28,7 +28,7 @@ If you change anything that requires a change to documentation then you will nee
 
 ### Compatibility
 
-CodeIgniter recommends PHP 7.2 or newer to be used
+This Fork of CodeIgniter 3 recommends PHP 7.4 or newer to be used
 
 ### Branching
 
@@ -64,7 +64,7 @@ Easy way GitHub allows in-line editing of files for making simple typo changes a
 Hard way The best way to contribute is to "clone" your fork of CodeIgniter to your development area. That sounds like some jargon, but "forking" on GitHub means "making a copy of that repo to your account" and "cloning" means "copying that code to your environment so you can work on it".
 
 1. [Set up Git](https://help.github.com/en/articles/set-up-git) (Windows, Mac & Linux)
-2. Go to the [CodeIgniter repo](https://github.com/bcit-ci/CodeIgniter)
+2. Go to the [Fork of CodeIgniter repo](https://github.com/NielBuys/CodeIgniter)
 3. [Fork it](https://help.github.com/en/articles/fork-a-repo)
 4. [Clone](https://help.github.com/en/articles/fetching-a-remote#clone) your forked CodeIgniter repo: git@github.com:<your-name>/CodeIgniter.git.
 5. Checkout the "develop" branch. At this point you are ready to start making changes.
@@ -79,11 +79,11 @@ Once the Reactor Engineer handling your pull request is happy with it they will 
 
 ### Keeping your fork up-to-date
 
-Unlike systems like Subversion, Git can have multiple remotes. A remote is the name for a URL of a Git repository. By default your fork will have a remote named "origin" which points to your fork, but you can add another remote named "codeigniter" which points to `git://github.com/bcit-ci/CodeIgniter.git`. This is a read-only remote but you can pull from this develop branch to update your own.
+Unlike systems like Subversion, Git can have multiple remotes. A remote is the name for a URL of a Git repository. By default your fork will have a remote named "origin" which points to your fork, but you can add another remote named "codeigniter" which points to `git://github.com/NielBuys/CodeIgniter.git`. This is a read-only remote but you can pull from this develop branch to update your own.
 
 If you are using command-line you can do the following:
 
-1. `git remote add codeigniter git://github.com/bcit-ci/CodeIgniter.git`
+1. `git remote add codeigniter git://github.com/NielBuys/CodeIgniter.git`
 2. `git pull codeigniter develop`
 3. `git push origin develop`
 

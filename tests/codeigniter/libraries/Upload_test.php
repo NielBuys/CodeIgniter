@@ -7,7 +7,7 @@ class Upload_test extends CI_TestCase {
 		$ci = $this->ci_instance();
 		$ci->upload = new CI_Upload();
 		$ci->security = new Mock_Core_Security();
-		$ci->lang = $this->getMockBuilder('CI_Lang')->setMethods(array('load', 'line'))->getMock();
+		$ci->lang = $this->getMockBuilder('CI_Lang')->onlyMethods(array('load', 'line'))->getMock();
 		$ci->lang->expects($this->any())->method('line')->will($this->returnValue(FALSE));
 		$this->upload = $ci->upload;
 	}
@@ -27,7 +27,9 @@ class Upload_test extends CI_TestCase {
 
 		$reflection = new ReflectionClass($upload);
 		$reflection = $reflection->getProperty('_file_name_override');
-		$reflection->setAccessible(TRUE);
+		if (PHP_VERSION_ID < 80500) {
+			$reflection->setAccessible(TRUE);
+		}
 		$this->assertEquals('foo', $reflection->getValue($upload));
 
 		$this->assertTrue($upload->file_ext_tolower);

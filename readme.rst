@@ -28,7 +28,7 @@ Installation
 
 CodeIgniter is installed in four steps:
 
-1. npm install nielbuys/framework
+1. composer require nielbuys/framework
 2. Change "codeigniter/framework" to "nielbuys/framework" in the "composer.json" file.
 3. Change in main "index.php" the following line from "$system_path = 'vendor/codeigniter/framework/system';" to "$system_path = 'vendor/nielbuys/framework/system';"
 4. Then run composer update.

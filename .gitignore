@@ -30,3 +30,5 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 *.sublime-project
 /tests/tests/
 /tests/results/
+/tests/.phpunit.result.cache
+/tests/travis/.phpunit.result.cache

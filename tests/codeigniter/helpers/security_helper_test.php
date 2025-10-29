@@ -1,14 +1,22 @@
 <?php
 
-class Security_helper_tests extends CI_TestCase {
+class Security_helper_test extends CI_TestCase {
 
-	function setUp()
-	{
-		$this->helper('security');
-		$obj = new stdClass;
-		$obj->security = new Mock_Core_Security();
-		$this->ci_instance($obj);
-	}
+    /**
+     * Sets up the environment before each test.
+     * Must be public to match CI_TestCase parent signature.
+     */
+    public function setUp() // Reverting signature to match CI_TestCase parent (no : void)
+    {
+        parent::setUp(); 
+
+        $obj = new stdClass(); 
+        $obj->security = new Mock_Core_Security();
+        
+        $this->ci_instance($obj);
+        
+        $this->helper('security');
+    }
 
 	function test_xss_clean()
 	{

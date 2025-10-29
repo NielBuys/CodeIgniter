@@ -117,7 +117,7 @@ class Like_test extends CI_TestCase {
 		$this->assertEquals($expected_name, $actual[0]['name']);
 	}
 
-	public function like_set_side_provider()
+	public static function like_set_side_provider()
 	{
 		return array(
 			array('Developer', 'none', 'Developer'),

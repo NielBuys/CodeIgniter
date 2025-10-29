@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <phpunit 
-	bootstrap="../../Bootstrap.php"
-	colors="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	stopOnError="false"
-	stopOnFailure="false"
-	stopOnIncomplete="false"
-	stopOnSkipped="false"
-	beStrictAboutTestsThatDoNotTestAnything="false">
-	<php>
+    bootstrap="../../Bootstrap.php"
+    colors="true"
+    stopOnError="false"
+    stopOnFailure="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    beStrictAboutTestsThatDoNotTestAnything="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd">
+
+    <php>
+        <!-- Updated for MySQL driver -->
         <const name="DB_DRIVER" value="pdo/mysql"/>
     </php>
-	<testsuites>
-		<testsuite name="CodeIgniter Core Test Suite">
-			<directory suffix="test.php">../../codeigniter</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-        <whitelist addUncoveredFilesFromWhitelist="false">
+    <testsuites>
+        <testsuite name="CodeIgniter Core Test Suite">
+            <directory suffix="test.php">../../codeigniter</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- 
+    PHPUnit 10/11 COMPATIBILITY: Uses the <source> tag instead of the deprecated <filter> tag.
+    The <source> tag is used to define which files should be included in the code coverage report.
+    -->
+    <source>
+        <include>
+            <!-- Include the CodeIgniter system and application directories for coverage -->
             <directory suffix=".php">../../../system</directory>
-        </whitelist>
-	</filter>
+            <directory suffix=".php">../../application</directory>
+        </include>
+        <exclude>
+            <!-- Exclude test files themselves from the coverage report -->
+            <directory>../../tests</directory>
+        </exclude>
+    </source>
 </phpunit>

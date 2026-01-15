@@ -10,6 +10,8 @@ interface and logical structure to access these libraries. CodeIgniter lets
 you creatively focus on your project by minimizing the amount of code needed
 for a given task.
 
+The purpose of this fork is to renew the legacy CodeIgniter 3 framework. It aims to stay current with security updates, PHP versions, and maintain backward compatibility without disrupting existing codebases.
+
 *******************
 Release Information
 *******************
@@ -20,22 +22,21 @@ https://github.com/NielBuys/CodeIgniter/releases
 Server Requirements
 *******************
 
-PHP version 7.4 or newer (PHP 8.5 ready) is recommended.
+PHP version 7.4 or newer is recommended (PHP 8.5 ready).
 
 ************
 Installation
 ************
 
+To update an Official CodeIgniter 3 with the Fork of CodeIgniter 3
+
+1. Change "codeigniter/framework" to "nielbuys/framework" in the "composer.json" file.
+2. Change in main "index.php" the following line from "$system_path = 'vendor/codeigniter/framework/system';" to "$system_path = 'vendor/nielbuys/framework/system';"
+3. Then run composer update.
+
 CodeIgniter is installed in four steps:
 
-1. composer require nielbuys/framework
-2. Change "codeigniter/framework" to "nielbuys/framework" in the "composer.json" file.
-3. Change in main "index.php" the following line from "$system_path = 'vendor/codeigniter/framework/system';" to "$system_path = 'vendor/nielbuys/framework/system';"
-4. Then run composer update.
-
-or
-
-1. Unzip the package.
+1. Unzip the package or composer require nielbuys/framework.
 2. Upload the CodeIgniter folders and files to your server. Normally the index.php file will be at your root.
 3. Open the application/config/config.php file with a text editor and set your base URL. If you intend to use encryption or sessions, set your encryption key.
 4. If you intend to use a database, open the application/config/database.php file with a text editor and set your database settings.

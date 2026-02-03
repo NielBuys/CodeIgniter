@@ -533,6 +533,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function join($table, $cond, $type = '', $escape = NULL)
 	{
+		$type = (string) $type;
+		$cond = (string) $cond;
+		$table = (string) $table;
+
 		if ($type !== '')
 		{
 			$type = strtoupper(trim($type));

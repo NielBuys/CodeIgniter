@@ -475,6 +475,8 @@ class CI_Encryption {
 			return FALSE;
 		}
 
+		$data = (string) $data;
+
 		$iv = ($iv_size = openssl_cipher_iv_length($params['handle']))
 			? $this->create_key($iv_size)
 			: '';
@@ -626,6 +628,13 @@ class CI_Encryption {
 	 */
 	protected function _openssl_decrypt($data, $params)
 	{
+		if (empty($params['handle']))
+		{
+			return FALSE;
+		}
+
+		$data = (string) $data;
+
 		if ($iv_size = openssl_cipher_iv_length($params['handle']))
 		{
 			$iv = self::substr($data, 0, $iv_size);
@@ -636,15 +645,13 @@ class CI_Encryption {
 			$iv = '';
 		}
 
-		return empty($params['handle'])
-			? FALSE
-			: openssl_decrypt(
-				$data,
-				$params['handle'],
-				$params['key'],
-				1, // DO NOT TOUCH!
-				$iv
-			);
+		return openssl_decrypt(
+			$data,
+			$params['handle'],
+			$params['key'],
+			1, // DO NOT TOUCH!
+			$iv
+		);
 	}
 
 	// --------------------------------------------------------------------

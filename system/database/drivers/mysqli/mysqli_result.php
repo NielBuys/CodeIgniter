@@ -167,7 +167,7 @@ class CI_DB_mysqli_result extends CI_DB_result {
 			);
 
 			if (defined('MYSQLI_TYPE_INTERVAL')) {
-				$map[MYSQLI_TYPE_INTERVAL] = 'interval';
+				$map[constant('MYSQLI_TYPE_INTERVAL')] = 'interval';
 			}
 		}
 

@@ -1,3 +1,36 @@
+# Line endings
+#
+# Checked out with LF everywhere, whatever core.autocrlf says locally.
+#
+# Without this, a Windows clone with core.autocrlf=true gets CRLF source, and
+# fifteen tests fail that pass everywhere else. They compare helper output
+# against a literal multi-line string written in the test file: the helpers
+# build their output from "\n" escapes, so they always emit LF, while the
+# expected value picks up whatever the file on disk uses. CRLF checkout, CRLF
+# expectation, LF actual, failure - in Form_helper_test, Html_helper_test and
+# Calendar_test.
+#
+# This only affects what lands in the working tree. Repository content is
+# unchanged, and PHP does not care either way, so nothing downstream breaks.
+* text=auto eol=lf
+
+# Windows-only files keep their native endings
+*.bat text eol=crlf
+
+# Binaries git should not touch at all
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.gz binary
+
 # This file tells which files and directories should be ignored and
 # NOT downloaded when using composer to pull down a project with
 # the --prefer-dist option selected. Used to remove development

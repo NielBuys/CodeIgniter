@@ -57,6 +57,23 @@ class CI_Form_validation {
 	protected $CI;
 
 	/**
+	 * Object that callback_ rules are resolved against.
+	 *
+	 * NULL means the CodeIgniter instance, which is the historic behaviour and
+	 * is correct when callbacks live on the controller.
+	 *
+	 * This exists because $CI was doing two unrelated jobs: it is the handle
+	 * for core services (lang, uri, router, input) AND it was the only place a
+	 * callback could be looked up. Code that wanted callbacks somewhere other
+	 * than the controller had to overwrite $CI outright, which quietly broke
+	 * the services and made the callback target depend on whoever assigned
+	 * last. Setting this instead leaves $CI alone.
+	 *
+	 * @var object|null
+	 */
+	protected $_callback_object = NULL;
+
+	/**
 	 * Validation data for the current form submission
 	 *
 	 * @var array
@@ -148,6 +165,46 @@ class CI_Form_validation {
 		$this->CI->load->helper('form');
 
 		log_message('info', 'Form Validation Class Initialized');
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set Callback Object
+	 *
+	 * Tells the validator where to look for callback_ rules. Without this the
+	 * only way to run callbacks on a model, a service or any other collaborator
+	 * is to overwrite $CI, which also hands it the job of supplying lang, uri,
+	 * router and input.
+	 *
+	 * The library is shared for the whole request, so set this immediately
+	 * before run() rather than once in a constructor - otherwise whoever
+	 * constructed last owns every callback lookup that follows.
+	 *
+	 * Pass NULL to go back to the CodeIgniter instance.
+	 *
+	 * @param	object|null	$object
+	 * @return	CI_Form_validation
+	 */
+	public function set_callback_object($object = NULL)
+	{
+		$this->_callback_object = is_object($object) ? $object : NULL;
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Callback Object
+	 *
+	 * Where callback_ rules are resolved, defaulting to the CodeIgniter
+	 * instance so existing controllers are unaffected.
+	 *
+	 * @return	object
+	 */
+	public function callback_object()
+	{
+		return isset($this->_callback_object) ? $this->_callback_object : $this->CI;
 	}
 
 	// --------------------------------------------------------------------
@@ -713,7 +770,9 @@ class CI_Form_validation {
 			{
 				if ($callback)
 				{
-					if ( ! method_exists($this->CI, $rule))
+					$object = $this->callback_object();
+
+					if ( ! method_exists($object, $rule))
 					{
 						log_message('debug', 'Unable to find callback validation rule: '.$rule);
 						$result = FALSE;
@@ -721,7 +780,7 @@ class CI_Form_validation {
 					else
 					{
 						// Run the function and grab the result
-						$result = $this->CI->$rule($postdata, $param);
+						$result = $object->$rule($postdata, $param);
 					}
 				}
 				else

@@ -3,7 +3,8 @@
 **Upstream:** https://github.com/bcit-ci/CodeIgniter/issues/6335
 **Reviewed:** 2026-08-21
 **Status:** Not actioned. Scope decision recorded in section 6 (mysqli-only); nullability default recorded in section 4 (option b).
-**Verdict:** Feature request, not a bug. Nothing is broken in this fork. Safe to skip.
+**Verdict:** Feature request, not a bug. Nothing is broken in this repository.
+Safe to skip.
 
 ---
 
@@ -45,7 +46,7 @@ undefined-property warning the moment the driver changes — the same trap that
 makes upstream's `mysqli_result` suggestion wrong. By contrast `primary_key` is
 populated in *every* driver-side implementation (odbc even hardcodes `0`).
 
-## 4. Scope if we do it "properly"
+## 4. Scope of a complete implementation
 
 33 call sites across 30 files. Grouped by how much work each needs:
 
@@ -89,8 +90,8 @@ column definition), `postgre_result`, `mssql_result`, `ibase_result`,
 `sqlite_result`, `sqlite3_result`, `odbc_result`.
 
 **This is the actual design decision**, and it is what makes "properly" bigger
-than the line count suggests. For drivers that cannot report nullability we must
-choose:
+than the line count suggests. For drivers that cannot report nullability, one
+of two options must be chosen:
 
 - **(a)** omit the property — back to the undefined-property trap; or
 - **(b)** default it (`1`, or `NULL`) and document it as "not all drivers report
@@ -117,23 +118,24 @@ be executed even if tests were written.
 
 | Scope | Effort | Risk |
 |-------|--------|------|
-| **mysqli only** (what this fork actually runs — `application/config/database.php:82` sets `'dbdriver' => 'mysqli'`) | ~15 min: 2 lines + 1 doc line | Very low. Both paths testable locally. |
+| **mysqli only** (the configured driver here — `application/config/database.php:82` sets `'dbdriver' => 'mysqli'`) | ~15 min: 2 lines + 1 doc line | Very low. Both paths testable locally. |
 | **All drivers, done properly** | ~2–3 h mechanical editing, plus the Firebird / DB2 / Informix SQL | 4 of 20 drivers would be changed **blind** — no test DB available. That untestability is the real cost, not the typing. |
 
 ## 6. Recommendation
 
-Skip unless we actually want metadata-driven forms.
+Skip unless metadata-driven form generation is actually wanted.
 
-If we do want it, prefer the **mysqli-only** scope and set the property from the
+If it is wanted, prefer the **mysqli-only** scope and set the property from the
 bitflag on the result side — do **not** paste upstream's `mysqli_result` line.
-Accept the driver inconsistency knowingly, since this fork only ships mysqli.
+The driver inconsistency is then accepted knowingly, since this repository only
+configures mysqli.
 
 Do not adopt the full 20-driver sweep: most of the value lands in mysqli, and the
-tail requires editing four drivers we cannot test.
+tail requires editing four drivers that cannot be tested here.
 
 ## 7. Fork context
 
 This fork already carries local divergence in `mysqli_result.php`
 (`_get_field_type()`, the `MYSQLI_TYPE_INTERVAL` deprecation fix in `2fbe8d10e`,
-and `f8f186bc0`), so we already maintain this area. But that also means upstream
-may never merge #6335 and we would own the divergence indefinitely.
+and `f8f186bc0`), so this area is already locally maintained. That also means
+upstream may never merge #6335, leaving the divergence owned here indefinitely.

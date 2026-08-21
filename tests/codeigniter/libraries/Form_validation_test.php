@@ -604,6 +604,79 @@ class Form_validation_test extends CI_TestCase {
 		$this->assertEquals('?&gt;', $this->form_validation->encode_php_tags('?>'));
 	}
 
+	// --------------------------------------------------------------------
+	// set_callback_object()
+	// --------------------------------------------------------------------
+
+	public function test_callback_object_defaults_to_the_ci_instance()
+	{
+		// The historic behaviour: callbacks live on the controller
+		$this->assertSame(
+			$this->ci_instance(),
+			$this->form_validation->callback_object()
+		);
+	}
+
+	public function test_set_callback_object_redirects_callback_lookup()
+	{
+		$this->form_validation->set_callback_object(new Form_validation_test_callbacks());
+
+		$this->assertTrue($this->run_rules(
+			array(array('field' => 'foo', 'label' => 'Foo', 'rules' => 'callback_is_the_word_ok')),
+			array('foo' => 'ok')
+		));
+
+		$this->assertFalse($this->run_rules(
+			array(array('field' => 'foo', 'label' => 'Foo', 'rules' => 'callback_is_the_word_ok')),
+			array('foo' => 'nope')
+		));
+	}
+
+	public function test_set_callback_object_leaves_the_ci_reference_alone()
+	{
+		// The point of the whole change. Overwriting $CI to move callbacks
+		// also took lang, uri, router and input with it.
+		$before = $this->ci_instance();
+
+		$this->form_validation->set_callback_object(new Form_validation_test_callbacks());
+
+		$this->assertSame($before, $this->ci_instance());
+		$this->assertNotSame($this->ci_instance(), $this->form_validation->callback_object());
+	}
+
+	public function test_set_callback_object_null_restores_the_ci_instance()
+	{
+		$this->form_validation->set_callback_object(new Form_validation_test_callbacks());
+		$this->form_validation->set_callback_object(NULL);
+
+		$this->assertSame($this->ci_instance(), $this->form_validation->callback_object());
+	}
+
+	public function test_set_callback_object_ignores_a_non_object()
+	{
+		$this->form_validation->set_callback_object('not an object');
+
+		$this->assertSame($this->ci_instance(), $this->form_validation->callback_object());
+	}
+
+	public function test_set_callback_object_is_chainable()
+	{
+		$this->assertSame(
+			$this->form_validation,
+			$this->form_validation->set_callback_object(new Form_validation_test_callbacks())
+		);
+	}
+
+	public function test_a_missing_callback_still_fails_rather_than_erroring()
+	{
+		$this->form_validation->set_callback_object(new Form_validation_test_callbacks());
+
+		$this->assertFalse($this->run_rules(
+			array(array('field' => 'foo', 'label' => 'Foo', 'rules' => 'callback_no_such_method')),
+			array('foo' => 'ok')
+		));
+	}
+
 	/**
 	 * Run rules
 	 *
@@ -625,5 +698,17 @@ class Form_validation_test extends CI_TestCase {
 		$_POST = array();
 
 		return $valid;
+	}
+}
+
+/**
+ * A collaborator that is not the controller, which is the whole point of
+ * set_callback_object().
+ */
+class Form_validation_test_callbacks {
+
+	public function is_the_word_ok($str)
+	{
+		return $str === 'ok';
 	}
 }

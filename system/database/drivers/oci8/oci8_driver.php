@@ -543,6 +543,7 @@ class CI_DB_oci8_driver extends CI_DB {
 				$default = '';
 			}
 			$retval[$i]->default = $default;
+			$retval[$i]->is_nullable = (int) ($query[$i]->NULLABLE === 'Y');
 		}
 
 		return $retval;

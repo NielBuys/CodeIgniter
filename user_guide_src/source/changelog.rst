@@ -17,6 +17,7 @@ Release Date: Not Released
    -  Added method ``set_callback_object()`` to :doc:`Form Validation Library <libraries/form_validation>` to resolve ``callback_`` rules against an object other than the controller, without overwriting ``$CI``.
    -  Added ``create_sid()`` to the :doc:`Session Library <libraries/sessions>` handler wrapper for PHP 8.6, which deprecates handlers without it.
    -  Added ``text/plain`` to the ``json`` entry in *application/config/mimes.php*, as ``finfo`` on Windows detects JSON files that way (pocketarc #57). Existing applications keep their own *mimes.php*.
+   -  Added an ``is_nullable`` property to :doc:`Database Metadata <database/metadata>` method ``field_data()`` (#6335). It is set by every driver; those that cannot report nullability return 1.
 
 -  **Security**
 

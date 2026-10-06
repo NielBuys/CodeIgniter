@@ -116,6 +116,7 @@ class CI_DB_mysqli_result extends CI_DB_result {
 			$retval[$i]->type		= static::_get_field_type($field_data[$i]->type);
 			$retval[$i]->max_length		= $field_data[$i]->max_length;
 			$retval[$i]->primary_key	= (int) ($field_data[$i]->flags & MYSQLI_PRI_KEY_FLAG);
+			$retval[$i]->is_nullable	= (int) ! ($field_data[$i]->flags & MYSQLI_NOT_NULL_FLAG);
 			$retval[$i]->default		= $field_data[$i]->def;
 		}
 

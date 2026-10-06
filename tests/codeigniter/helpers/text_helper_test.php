@@ -103,15 +103,27 @@ class Text_helper_test extends CI_TestCase {
 	{
 		if (substr(PHP_VERSION, 0, 3) >= '8.3')
 		{
-			$expect = "<pre><code style=\"color: #000000\"><span style=\"color: #0000BB\">&lt;?php var_dump</span><span style=\"color: #007700\">(</span><span style=\"color: #0000BB\">\$this</span><span style=\"color: #007700\">); </span><span style=\"color: #0000BB\">?&gt; ?&gt;</span></code></pre>";
+			$expect = "<pre><code style=\"color: #000000\"><span style=\"color: #0000BB\">&lt;?php var_dump</span><span style=\"color: #007700\">(</span><span style=\"color: #0000BB\">\$this</span><span style=\"color: #007700\">); </span><span style=\"color: #0000BB\">?&gt; </span></code></pre>";
 		}
 		else
 		{
 			$expect = "<code><span style=\"color: #000000\">\n<span style=\"color: #0000BB\">&lt;?php&nbsp;var_dump</span><span style=\"color: #007700\">(</span><span style=\"color: #0000BB\">\$this</span><span style=\"color: #007700\">);&nbsp;</span><span style=\"color: #0000BB\">?&gt;&nbsp;</span>\n</span>\n</code>";
 		}
-		
+
 
 		$this->assertEquals($expect, highlight_code('<?php var_dump($this); ?>'));
+
+		// Code without PHP tags, e.g. database queries in the profiler
+		if (substr(PHP_VERSION, 0, 3) >= '8.3')
+		{
+			$expect_query = "<pre><code style=\"color: #000000\"><span style=\"color: #0000BB\">SELECT </span><span style=\"color: #007700\">* </span><span style=\"color: #0000BB\">FROM users</span><span style=\"color: #007700\">; </span></code></pre>";
+		}
+		else
+		{
+			$expect_query = "<code><span style=\"color: #000000\">\n<span style=\"color: #0000BB\">SELECT&nbsp;</span><span style=\"color: #007700\">*&nbsp;</span><span style=\"color: #0000BB\">FROM&nbsp;users</span><span style=\"color: #007700\">;&nbsp;</span>\n</span>\n</code>";
+		}
+
+		$this->assertEquals($expect_query, highlight_code('SELECT * FROM users;'));
 	}
 
 	// ------------------------------------------------------------------------

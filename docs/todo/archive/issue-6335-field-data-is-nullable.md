@@ -3,7 +3,7 @@
 **Upstream:** https://github.com/bcit-ci/CodeIgniter/issues/6335
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-08-21
-**Status:** Applied 2026-10-07 in `ed531d39a`: middle-ground scope (section 8), which
+**Status:** Applied 2026-10-06 in `ed531d39a`: middle-ground scope (section 8), which
 replaces the earlier mysqli-only decision. Nullability default per section 4 (option b).
 **Verdict:** Feature request, not a bug. Nothing is broken in this repository.
 Safe to skip.
@@ -48,7 +48,7 @@ undefined-property warning the moment the driver changes — the same trap that
 makes upstream's `mysqli_result` suggestion wrong. By contrast `primary_key` is
 populated in *every* driver-side implementation (odbc even hardcodes `0`).
 
-> **Correction (2026-10-07).** Not every driver-side implementation sets
+> **Correction (2026-10-06).** Not every driver-side implementation sets
 > `primary_key`: `oci8_driver` and `pdo_oci_driver` do not, and none of the
 > MSSQL, PostgreSQL, Firebird or Informix ones do either. The point about
 > consistency still stands; `primary_key` is simply not the clean precedent
@@ -150,7 +150,7 @@ upstream may never merge #6335, leaving the divergence owned here indefinitely.
 
 ## 8. Decision: middle-ground scope
 
-**Decided (2026-10-07): middle ground**, replacing the mysqli-only scope in
+**Decided (2026-10-06): middle ground**, replacing the mysqli-only scope in
 section 6. The property is purely additive, but for ten drivers the full
 implementation would change the SQL that `field_data()` already runs. A wrong
 query there breaks `field_data()` for every existing caller on that database,

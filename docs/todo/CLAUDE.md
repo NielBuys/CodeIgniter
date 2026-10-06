@@ -87,6 +87,29 @@ When a decision is made, record it in the section it belongs to — for example
 "**Decided: (b).**" — and point to it from the `Status` line. Do not leave the
 reasoning only in chat.
 
+## Comparing with other forks
+
+This repository is based on upstream **`3.1-stable`** (the release branch) and
+continues from there. It does **not** take upstream `develop` content; individual
+fixes from `develop` are only ported deliberately, one at a time (as in 3.1.14).
+
+pocketarc/codeigniter is based on upstream **`develop`**. Its tree therefore
+carries upstream `develop` work this repository will never have, alongside
+pocketarc's own changes. Consequences for any comparison:
+
+- **Never diff the two trees as a whole.** The result mixes upstream `develop`
+  changes, pocketarc's changes and this fork's changes, and is mostly noise.
+  pocketarc's PR against bcit-ci (6336) showed 79 files for a 9-file change for
+  this reason.
+- **Compare pocketarc tag to tag** (for example `3.4.4...3.4.5`) and review
+  each PR in that range. That isolates what pocketarc itself changed.
+- **Check where a change originates** before proposing it. If it exists in
+  upstream `develop` but not `3.1-stable`, it is `develop` content: out of scope
+  unless it is requested on its own.
+- Pocketarc releases before 3.4.4 were never reviewed as a set; some of their
+  fixes arrived in 3.1.23 via PR #13. Start new reviews from the next pocketarc
+  release after 3.4.5.
+
 ## Scope
 
 These documents do not change code. Implementation is a separate, explicitly

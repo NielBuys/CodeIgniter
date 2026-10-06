@@ -3,7 +3,8 @@
 **Upstream:** https://github.com/bcit-ci/CodeIgniter/issues/6337
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-10-02
-**Status:** Not actioned.
+**Status:** Applied 2026-10-07 in `18b862671`, option (a) (section 8). Upgrade note for
+the release in section 10.
 **Verdict:** Genuine bug, present in this repository on a different line. The
 one-line fix proposed upstream is correct. It removes a leftover from the #113 fix
 that should have gone when #3816 was fixed, and makes array-notation fields
@@ -33,6 +34,10 @@ symptom for plain fields, fixed only for plain fields). The reporter mentions
 `Form_validation.php:582`), so neither fork has fixed this yet.
 
 ## 2. Where the defect is in this repository
+
+> Line numbers in sections 2–7 refer to `Form_validation.php` as reviewed, before
+> `18b862671`. That commit removed two lines (626–627), so every reference after
+> line 627 is now two lines lower in the file.
 
 Upstream cites `Form_validation.php:573`/`:577` at `3658d73`. Here the same code
 sits at [Form_validation.php:619-628](system/libraries/Form_validation.php#L619-L628).
@@ -159,6 +164,15 @@ This change can be fully tested without a database. Suggested additions to
   fix);
 - a callback on a blank `name[key]` field receives `''`.
 
+**Added in `18b862671`**, together with a fourth test for `matches` between two
+blank array fields. Without the fix, three of the four fail. The #113 test
+passes either way, as it should: it guards against a regression.
+
+Note for anyone writing a `matches` test: `set_rules()` ignores a field whose
+rule string is empty, so the target of `matches[...]` must carry at least one
+rule (the test uses `trim`). Otherwise `matches` has no `postdata` to compare
+against and fails, for plain and array fields alike.
+
 ## 8. Effort and scope options
 
 | Option | Effort | Risk |
@@ -177,3 +191,43 @@ This change can be fully tested without a database. Suggested additions to
    upstream and pocketarc can take the same fix.
 
 Nothing is deferred.
+
+**Decided: (a).** Applied in `18b862671`. Steps 2 and 3 are outside this
+repository: step 2 is the upgrade note in section 10, and step 3 is still open.
+
+### Downstream scans before the decision
+
+Two dependants were searched for the patterns in section 5 (validation rules on
+`name[key]` fields, callbacks on them, `matches` between them, and `set_value()`
+on them):
+
+| Dependant | Result |
+|-----------|--------|
+| NCompPOSv2 | Not affected. All rules are on plain fields, the two `matches` rules are on plain fields, `set_value()` is never called (forms repopulate through the application's own `form_value()`), and its `custom[ID]` fields are validated outside `CI_Form_validation`. |
+| [ixaya/manager](https://packagist.org/packages/ixaya/manager) 2.4.0 (`6c342e0`) | Not affected. The package makes no `set_rules()`, `set_value()` or `matches` calls and does not extend `CI_Form_validation`. Its two sample applications under `extras/` validate only plain `email` and `password` fields. |
+
+Applications built on ixaya/manager could not be scanned. ixaya/manager
+requires `nielbuys/framework ^3.1`, which accepts any 3.x release, so a minor
+version bump does not hold the change back from them; the upgrade note is the
+only warning they get.
+
+## 10. Upgrade note for the release
+
+Release notes here are generated from PR titles, and
+[changelog.rst](user_guide_src/source/changelog.rst) has not been maintained
+since 3.1.13, so this text must be added to the GitHub release by hand:
+
+> **Behaviour change — blank array-notation fields (#6337).** A field named with
+> array notation (for example `address[city]`) that is submitted blank now keeps
+> its blank value, the same as a plain field. Previously it was treated as "not
+> submitted", so `set_value()` showed the default again.
+>
+> Check before upgrading, for rules on `name[key]` fields only:
+>
+> - **Callbacks** now receive `''` instead of `NULL` for a blank value. A
+>   callback that uses `=== NULL` or `is_null()` to mean "left blank" must also
+>   accept `''`.
+> - **`matches`** between two blank array fields now passes. Add `required`
+>   where a blank pair must be rejected.
+>
+> Plain fields are unaffected.

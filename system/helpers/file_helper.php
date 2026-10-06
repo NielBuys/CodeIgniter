@@ -248,8 +248,14 @@ if ( ! function_exists('get_dir_file_info'))
 				}
 				elseif ($file[0] !== '.')
 				{
-					$_filedata[$file] = get_file_info($source_dir.$file);
-					$_filedata[$file]['relative_path'] = $relative_path;
+					$filedata = get_file_info($source_dir.$file);
+
+					// get_file_info() returns FALSE for e.g. broken symlinks
+					if (is_array($filedata))
+					{
+						$filedata['relative_path'] = $relative_path;
+						$_filedata[$file] = $filedata;
+					}
 				}
 			}
 

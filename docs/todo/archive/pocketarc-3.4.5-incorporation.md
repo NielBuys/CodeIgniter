@@ -3,7 +3,9 @@
 **Release:** https://github.com/pocketarc/codeigniter/releases/tag/3.4.5 (published 2026-09-14)
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-10-06
-**Status:** Not actioned.
+**Status:** Applied 2026-10-06 in `75e7411e2`: `highlight_code()` (section 3) and the
+JSON MIME type (section 4). PHP 8.6 test infrastructure is deferred until PHP 8.6 is
+released (section 5).
 **Verdict:** One real gap: the `highlight_code()` fix for PHP 8.3+, which removes a
 stray `?>` from every query in the profiler. The JSON MIME change is worth taking
 into the application template. The rest is already present here, does not apply,
@@ -147,6 +149,10 @@ string and adds a no-PHP-tags case (the profiler's real input). It should be
 ported along with the fix. The pre-8.3 branch cannot be run locally; CI covers
 PHP 7.4.
 
+**Decided: ported** in `75e7411e2`, fix and test together. The test keeps the
+local `substr(PHP_VERSION, 0, 3) >= '8.3'` check rather than pocketarc's
+`PHP_VERSION_ID`, to match the existing method.
+
 ---
 
 ## 4. PR #58 (fixes #57) — JSON uploads as `text/plain` — TEMPLATE ONLY
@@ -183,6 +189,9 @@ is in line with existing practice.
 should also port cleanly into the local `test_is_allowed_filetype()`
 ([Upload_test.php:183](tests/codeigniter/libraries/Upload_test.php#L183)).
 
+**Decided: ported** in `75e7411e2`, with the upload test assertions.
+Applications that need it must still add `text/plain` to their own `mimes.php`.
+
 ---
 
 ## 5. PR #56 — PHP 8.6 support — MOSTLY PRESENT OR OPTIONAL
@@ -196,6 +205,11 @@ should also port cleanly into the local `test_is_allowed_filetype()`
 | PHP 8.6 in the CI matrix | Absent ([test-phpunit.yml:15](.github/workflows/test-phpunit.yml#L15) stops at 8.5) | Optional. pocketarc also dropped its JIT jobs and the `imagick` extension. Those are matrix choices for that fork, not requirements. |
 | README "PHP 8.6" | [readme.rst:25](readme.rst#L25) says "PHP 8.5 ready" | Update only once 8.6 runs in CI. |
 | `CI_VERSION` bump | — | Section 6. |
+
+**Decided: deferred until PHP 8.6 is released.** Add 8.6 to the CI matrix then,
+with `tests/patch-vendor.php` in the same change, and update the README once it
+passes. None of these files are under `system/`, so the deferral has no effect on
+applications.
 
 ---
 
@@ -234,12 +248,13 @@ this folder's conventions do not apply.
 ## 8. Recommended order of work
 
 1. **Port the `highlight_code()` fix and its test (#54).** The only functional
-   gap; a visible defect in the profiler on PHP 8.3+.
+   gap; a visible defect in the profiler on PHP 8.3+. **Done.**
 2. **Add `text/plain` to `json` in the template `mimes.php`, with the upload
    test (#58).** Cheap. Applications that need it must also edit their own
-   `mimes.php`.
+   `mimes.php`. **Done.**
 3. **Defer the PHP 8.6 test infrastructure (#56)** until 8.6 is wanted in CI.
-   Take `patch-vendor.php` and the matrix entry together.
+   Take `patch-vendor.php` and the matrix entry together. **Deferred until PHP
+   8.6 is released.**
 4. **No action** on `create_sid()`, `xml_parser_free()`, the `updateTimestamp`
    typo or `.gitignore`: already present.
 5. **Separately decide** the `CI_VERSION` value (section 6). It is a local

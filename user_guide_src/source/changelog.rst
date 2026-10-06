@@ -7,6 +7,14 @@ fork. Issue numbers without a prefix refer to the original
 `bcit-ci/CodeIgniter <https://github.com/bcit-ci/CodeIgniter>`_ repository; ``pocketarc #N`` refers to
 `pocketarc/codeigniter <https://github.com/pocketarc/codeigniter>`_.
 
+Version 3.1.25
+==============
+
+Release Date: Not Released
+
+Bug fixes for 3.1.25
+====================
+
 Version 3.1.24
 ==============
 

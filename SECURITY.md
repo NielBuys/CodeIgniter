@@ -4,7 +4,9 @@
 
 This repository is a **maintained fork of CodeIgniter 3**, branched from upstream
 [`bcit-ci/CodeIgniter`](https://github.com/bcit-ci/CodeIgniter) `3.1-stable`
-(`CI_VERSION = '3.1.13-dev'`), with additional PHP 8+ compatibility fixes.
+at version `3.1.13-dev`, with additional PHP 8+ compatibility fixes. Fork releases
+continue the numbering from 3.1.13.1; `CI_VERSION` follows the release tag from
+3.1.24 onwards.
 
 Upstream CodeIgniter 3 is effectively **end-of-life**: pull requests are no longer
 being merged and there is **no official security page or advisory feed**. As a

@@ -10,13 +10,14 @@ fork. Issue numbers without a prefix refer to the original
 Version 3.1.24
 ==============
 
-Release Date: Not Released
+Release Date: Oct 7, 2026
 
 -  General Changes
 
    -  Added method ``set_callback_object()`` to :doc:`Form Validation Library <libraries/form_validation>` to resolve ``callback_`` rules against an object other than the controller, without overwriting ``$CI``.
    -  Added ``create_sid()`` to the :doc:`Session Library <libraries/sessions>` handler wrapper for PHP 8.6, which deprecates handlers without it.
    -  Added ``text/plain`` to the ``json`` entry in *application/config/mimes.php*, as ``finfo`` on Windows detects JSON files that way (pocketarc #57). Existing applications keep their own *mimes.php*.
+   -  Updated ``CI_VERSION`` to ``3.1.24``. It had stayed at ``3.1.13-dev`` through releases 3.1.13.1 - 3.1.23, and is now bumped with each release.
 
 -  **Security**
 

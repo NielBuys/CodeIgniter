@@ -3,7 +3,7 @@
 **Upstream:** https://github.com/bcit-ci/CodeIgniter/issues/6337
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-10-02
-**Status:** Applied 2026-10-07 in `18b862671`, option (a) (section 8). Upgrade note for
+**Status:** Applied 2026-10-06 in `18b862671`, option (a) (section 8). Upgrade note for
 the release in section 10.
 **Verdict:** Genuine bug, present in this repository on a different line. The
 one-line fix proposed upstream is correct. It removes a leftover from the #113 fix
@@ -213,9 +213,10 @@ only warning they get.
 
 ## 10. Upgrade note for the release
 
-Release notes here are generated from PR titles, and
-[changelog.rst](user_guide_src/source/changelog.rst) has not been maintained
-since 3.1.13, so this text must be added to the GitHub release by hand:
+Release notes here are generated from PR titles, so this text must be added to
+the GitHub release by hand. The same note is in
+[changelog.rst](user_guide_src/source/changelog.rst) under 3.1.25. This change
+was held out of 3.1.24 so users had a release cycle to comment on PR #21.
 
 > **Behaviour change — blank array-notation fields (#6337).** A field named with
 > array notation (for example `address[city]`) that is submitted blank now keeps

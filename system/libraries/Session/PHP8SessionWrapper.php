@@ -47,7 +47,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author	Andrey Andreev
  * @link	https://codeigniter.com/userguide3/libraries/sessions.html
  */
-class CI_SessionWrapper implements SessionHandlerInterface, SessionUpdateTimestampHandlerInterface {
+class CI_SessionWrapper implements SessionHandlerInterface, SessionIdInterface, SessionUpdateTimestampHandlerInterface {
 
 	protected CI_Session_driver_interface $driver;
 
@@ -86,6 +86,24 @@ class CI_SessionWrapper implements SessionHandlerInterface, SessionUpdateTimesta
 	public function gc(int $maxlifetime): mixed
 	{
 		return $this->driver->gc($maxlifetime);
+	}
+
+	/**
+	 * Create a session ID
+	 *
+	 * Required of every handler from PHP 9.0, and deprecated to omit from
+	 * PHP 8.6. Generated here rather than through session_create_id(),
+	 * which calls back into this method while a session is active, as it
+	 * is during session_start() and session_regenerate_id().
+	 *
+	 * The format must match CI_Session::_configure_sid_length(), which
+	 * pins every session ID to 32 hex characters.
+	 *
+	 * @return	string
+	 */
+	public function create_sid(): string
+	{
+		return bin2hex(random_bytes(16));
 	}
 
 	public function updateTimestamp(string $id, string $data): bool

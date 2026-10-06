@@ -269,7 +269,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	 */
 	public function field_data($table)
 	{
-		$sql = 'SELECT "column_name", "data_type", "character_maximum_length", "numeric_precision", "column_default"
+		$sql = 'SELECT "column_name", "data_type", "character_maximum_length", "numeric_precision", "column_default", "is_nullable"
 			FROM "information_schema"."columns"
 			WHERE "table_schema" = \''.$this->schema.'\' AND LOWER("table_name") = '.$this->escape(strtolower($table));
 
@@ -287,6 +287,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 			$retval[$i]->type		= $query[$i]->data_type;
 			$retval[$i]->max_length		= ($query[$i]->character_maximum_length > 0) ? $query[$i]->character_maximum_length : $query[$i]->numeric_precision;
 			$retval[$i]->default		= $query[$i]->column_default;
+			$retval[$i]->is_nullable	= (int) ($query[$i]->is_nullable === 'YES');
 		}
 
 		return $retval;

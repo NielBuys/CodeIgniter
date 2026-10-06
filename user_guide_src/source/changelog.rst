@@ -12,6 +12,10 @@ Version 3.1.25
 
 Release Date: Not Released
 
+-  General Changes
+
+   -  Added an ``is_nullable`` property to :doc:`Database Metadata <database/metadata>` method ``field_data()`` (#6335). It is set by every driver; those that cannot report nullability return 1.
+
 Bug fixes for 3.1.25
 ====================
 

@@ -1,8 +1,10 @@
 # Issue #6335 — `is_nullable` in `field_data()`
 
 **Upstream:** https://github.com/bcit-ci/CodeIgniter/issues/6335
+**Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-08-21
-**Status:** Not actioned. Scope decision recorded in section 6 (mysqli-only); nullability default recorded in section 4 (option b).
+**Status:** Applied 2026-10-07 in `ed531d39a`: middle-ground scope (section 8), which
+replaces the earlier mysqli-only decision. Nullability default per section 4 (option b).
 **Verdict:** Feature request, not a bug. Nothing is broken in this repository.
 Safe to skip.
 
@@ -45,6 +47,12 @@ repo has 20 driver-side and 13 result-side `field_data()` implementations. If
 undefined-property warning the moment the driver changes — the same trap that
 makes upstream's `mysqli_result` suggestion wrong. By contrast `primary_key` is
 populated in *every* driver-side implementation (odbc even hardcodes `0`).
+
+> **Correction (2026-10-07).** Not every driver-side implementation sets
+> `primary_key`: `oci8_driver` and `pdo_oci_driver` do not, and none of the
+> MSSQL, PostgreSQL, Firebird or Informix ones do either. The point about
+> consistency still stands; `primary_key` is simply not the clean precedent
+> claimed here.
 
 ## 4. Scope of a complete implementation
 
@@ -139,3 +147,75 @@ This fork already carries local divergence in `mysqli_result.php`
 (`_get_field_type()`, the `MYSQLI_TYPE_INTERVAL` deprecation fix in `2fbe8d10e`,
 and `f8f186bc0`), so this area is already locally maintained. That also means
 upstream may never merge #6335, leaving the divergence owned here indefinitely.
+
+## 8. Decision: middle-ground scope
+
+**Decided (2026-10-07): middle ground**, replacing the mysqli-only scope in
+section 6. The property is purely additive, but for ten drivers the full
+implementation would change the SQL that `field_data()` already runs. A wrong
+query there breaks `field_data()` for every existing caller on that database,
+whether or not it reads `is_nullable`. The rule applied is therefore: report the
+real value where no query changes or where CI can test the change; otherwise set
+the option (b) default of `1` and leave the query alone.
+
+### Table metadata (`$db->field_data('table')`)
+
+| Drivers | Value | How |
+|---------|-------|-----|
+| mysqli, mysql, cubrid, pdo_mysql, pdo_cubrid | Real | `Null` column already in the `SHOW COLUMNS` row |
+| sqlite, sqlite3, pdo_sqlite | Real | `notnull` already in the `PRAGMA TABLE_INFO` row |
+| oci8, pdo_oci | Real | `NULLABLE` already selected |
+| postgre, pdo_pgsql | Real | `"is_nullable"` added to the SELECT; covered by the pgsql and pdo/pgsql CI jobs |
+| mssql, sqlsrv, pdo_dblib, pdo_sqlsrv | `1` | Query unchanged |
+| ibase, pdo_firebird, pdo_ibm, pdo_informix | `1` | Query unchanged; the result is post-processed in a loop to add the property |
+
+odbc, pdo_4d and the other pdo subdrivers without their own `field_data()` go
+through `DB_driver::field_data()` and get the result-side value below.
+
+### Result metadata (`$query->field_data()`)
+
+| Drivers | Value | Source |
+|---------|-------|--------|
+| mysqli | Real | `flags & MYSQLI_NOT_NULL_FLAG` |
+| mysql, cubrid | Real | `*_field_flags()` contains `not_null` |
+| pdo | Real only where the subdriver reports `not_null` in `getColumnMeta()` flags (pdo/mysql); otherwise `1` | |
+| sqlsrv | Real | `Nullable` key of `sqlsrv_field_metadata()`; `1` unless it is `SQLSRV_NULLABLE_NO` |
+| postgre, oci8, mssql, ibase, sqlite, sqlite3, odbc | `1` | No API |
+
+The section 2 caveat applies: result metadata describes the result set, so a
+`LEFT JOIN` column or an expression can be nullable when the base column is not.
+The user guide ([metadata.rst](user_guide_src/source/database/metadata.rst))
+documents which drivers report a real value.
+
+### Tests
+
+New [DB_field_data_test.php](tests/codeigniter/database/DB_field_data_test.php)
+creates a table with two `NOT NULL` columns and one nullable column, then checks
+both `field_data()` paths. It runs in the six CI database jobs (mysqli,
+pdo/mysql, pgsql, pdo/pgsql, sqlite, pdo/sqlite). Table metadata must be real on
+all six; result metadata must be real on mysqli and pdo/mysql and `1`
+elsewhere.
+
+Run locally on PHP 8.5.4: the sqlite job (sqlite3 driver) passes, as does the
+full sqlite suite apart from the existing `Calendar_test` failure. Both new tests
+fail without the driver changes. The pdo/sqlite job also passed, with one
+temporary change: its test DSN (`'sqlite:/'.realpath(...)`) produces
+`sqlite:/C:/...`, which does not resolve on Windows, so it was edited for the
+run and then restored. The existing database tests fail the same way locally.
+The MySQL and PostgreSQL jobs were not run locally; they need the `travis`
+user and `ci_test` database, and CI provides them.
+
+### Pre-existing defects noticed while implementing
+
+Separate from #6335 and not changed here. All are inherited from upstream.
+
+- **`pdo_oci_driver::field_data()`** assigns `$query[$i]->COLUMN_DEFAULT`, a
+  column the query never selects, so `default` is always `NULL` (with an
+  undefined-property warning). The `$default` computed just above it is unused.
+  `oci8_driver` assigns `$default` correctly.
+- **`pdo_ibm_driver::field_data()`** uses `CASE "keyseq" WHEN NULL THEN 0 ELSE 1
+  END`. `WHEN NULL` never matches, so every column reports `primary_key = 1`.
+  Needs `CASE WHEN "keyseq" IS NULL THEN 0 ELSE 1 END`.
+- **`pdo_informix_driver::field_data()`** inner-joins `sysdefaults`, which
+  appears to list only columns that have a default, so columns without one would
+  be missing from the result. Unverified; no Informix instance is available.

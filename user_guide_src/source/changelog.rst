@@ -15,6 +15,10 @@ Release Date: Not Released
 Bug fixes for 3.1.25
 ====================
 
+-  Fixed a bug (#6337) - :doc:`Form Validation Library <libraries/form_validation>` treated a blank array-notation field (e.g. ``address[city]``) as not submitted, so ``set_value()`` repopulated it with the default. Array-notation fields now behave like plain fields.
+
+   .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
+
 Version 3.1.24
 ==============
 

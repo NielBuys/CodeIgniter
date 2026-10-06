@@ -623,8 +623,7 @@ class CI_Form_validation {
 			return isset($array[$keys[$i]]) ? $this->_reduce_array($array[$keys[$i]], $keys, ($i+1)) : NULL;
 		}
 
-		// NULL must be returned for empty fields
-		return ($array === '') ? NULL : $array;
+		return $array;
 	}
 
 	// --------------------------------------------------------------------

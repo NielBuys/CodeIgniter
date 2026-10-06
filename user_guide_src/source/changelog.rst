@@ -27,6 +27,9 @@ Bug fixes for 3.1.24
 
 -  Fixed a bug (pocketarc #51) - :doc:`Text Helper <helpers/text_helper>` function :php:func:`highlight_code()` left a stray ``?>`` at the end of its output on PHP 8.3+, visible on every query in the :doc:`Profiler <general/profiling>`.
 -  Fixed a bug (pocketarc #47) - :doc:`File Helper <helpers/file_helper>` function :php:func:`get_dir_file_info()` raised a PHP 8.1 "automatic conversion of false to array" deprecation for entries ``get_file_info()`` cannot read, such as broken symlinks. Such entries are now skipped.
+-  Fixed a bug (#6337) - :doc:`Form Validation Library <libraries/form_validation>` treated a blank array-notation field (e.g. ``address[city]``) as not submitted, so ``set_value()`` repopulated it with the default. Array-notation fields now behave like plain fields.
+
+   .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
 Version 3.1.23
 ==============

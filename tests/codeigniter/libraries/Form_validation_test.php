@@ -462,6 +462,55 @@ class Form_validation_test extends CI_TestCase {
 		$_POST = array();
 	}
 
+	public function test_set_value_blank_array_field()
+	{
+		// #6337: a blank array-notation field must repopulate as blank,
+		// not with the default - the same as a plain field does
+		$this->form_validation->set_rules('city', 'City', 'required');
+		$this->form_validation->set_rules('address[city]', 'City', 'required');
+
+		$_POST = array('city' => '', 'address' => array('city' => ''));
+		$this->assertFalse($this->form_validation->run());
+		$this->assertSame('', $this->form_validation->set_value('city', 'default'));
+		$this->assertSame('', $this->form_validation->set_value('address[city]', 'default'));
+		$this->assertSame('', set_value('address[city]', 'default'));
+
+		$_POST = array();
+	}
+
+	public function test_blank_optional_array_field_skips_rules()
+	{
+		// #113: a blank, non-required array field must not fail valid_email
+		$rules = array(array('field' => 'user[email]', 'label' => 'Email', 'rules' => 'valid_email'));
+
+		$this->assertTrue($this->run_rules($rules, array('user' => array('email' => ''))));
+		$this->assertFalse($this->run_rules($rules, array('user' => array('email' => 'invalid'))));
+	}
+
+	public function test_blank_array_field_callback_receives_empty_string()
+	{
+		$callbacks = new Form_validation_test_callbacks();
+		$this->form_validation->set_callback_object($callbacks);
+
+		$this->assertTrue($this->run_rules(
+			array(array('field' => 'address[city]', 'label' => 'City', 'rules' => 'callback_remember')),
+			array('address' => array('city' => ''))
+		));
+		$this->assertSame('', $callbacks->remembered);
+	}
+
+	public function test_rule_matches_blank_array_fields()
+	{
+		// Two blank fields match, as they do for plain fields
+		$rules = array(
+			array('field' => 'pw[a]', 'label' => 'Password', 'rules' => 'matches[pw[b]]'),
+			array('field' => 'pw[b]', 'label' => 'Confirm', 'rules' => 'trim')
+		);
+
+		$this->assertTrue($this->run_rules($rules, array('pw' => array('a' => '', 'b' => ''))));
+		$this->assertFalse($this->run_rules($rules, array('pw' => array('a' => '', 'b' => 'x'))));
+	}
+
 	public function test_set_select()
 	{
 		// Test 1: No options selected
@@ -707,8 +756,16 @@ class Form_validation_test extends CI_TestCase {
  */
 class Form_validation_test_callbacks {
 
+	public $remembered = FALSE;
+
 	public function is_the_word_ok($str)
 	{
 		return $str === 'ok';
+	}
+
+	public function remember($str)
+	{
+		$this->remembered = $str;
+		return TRUE;
 	}
 }

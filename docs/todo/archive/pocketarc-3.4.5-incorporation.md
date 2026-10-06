@@ -230,7 +230,7 @@ process: `3.1.24-dev`, or bumping on every tag. Anything that compares
 `CI_VERSION` would see the jump from 13 to 23 or 24. A release-process decision,
 not part of this incorporation.
 
-**Decided (2026-10-07): bump on every tag.** Set to `3.1.24` in the 3.1.24
+**Decided (2026-10-06): bump on every tag.** Set to `3.1.24` in the 3.1.24
 release preparation, together with `user_guide_src/source/conf.py` and the
 current-version link in `installation/downloads.rst`.
 

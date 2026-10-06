@@ -10,7 +10,7 @@ fork. Issue numbers without a prefix refer to the original
 Version 3.1.24
 ==============
 
-Release Date: Oct 7, 2026
+Release Date: Oct 6, 2026
 
 -  General Changes
 

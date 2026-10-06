@@ -3,7 +3,7 @@
 **Source:** found in this repository while implementing #6335 (`is_nullable`, PR #22).
 No upstream issue exists.
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
-**Reviewed:** 2026-10-07
+**Reviewed:** 2026-10-06
 **Status:** Not actioned.
 **Verdict:** Four defects in three PDO subdrivers, all inherited unchanged from
 upstream (2012). The pdo_oci fix is a one-line correction with no SQL change and

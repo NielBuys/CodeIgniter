@@ -42,7 +42,7 @@ fork's `system/` directory before acting, then patch on a dedicated `tasks/` bra
 
 Based on a systematic sweep (2026-07-17) of the FriendsOfPHP/PHP Security Advisories
 DB — the source `composer audit` uses — and the GitHub Advisory Database entries for
-`codeigniter/framework`. Re-swept 2026-10-07 (see "Sweep log" below).
+`codeigniter/framework`. Re-swept 2026-10-06 (see "Sweep log" below).
 
 ### Framework issues fixed upstream at or below this fork's base (inherited)
 
@@ -96,7 +96,7 @@ repository reports them.
 | Date | Sources | Result |
 |---|---|---|
 | 2026-07-17 | FriendsOfPHP DB, GitHub Advisory DB | Initial tables above |
-| 2026-10-07 | GitHub Advisory DB (`codeigniter/framework`, `nielbuys/framework`, `pocketarc/codeigniter`), FriendsOfPHP DB (no commits under `codeigniter/` since 2026-07-01), Packagist security-advisories API for every package in `composer.lock` (equivalent of `composer audit`), NVD keyword search for CVEs published 2026-07-01 to 2026-10-07, Snyk, web search | No new framework advisory. Added the previously unlisted CVE-2018-12071 (inherited fix) and CVE-2024-41344's ID. New CVEs are CI4 / CI4-app / app-level; one CI4 counterpart (`is_https()`) recorded as low. PHPUnit lock affected but not exploitable. OpenCVE not checked (needs an account); NVD covers the same CVE data. |
+| 2026-10-06 | GitHub Advisory DB (`codeigniter/framework`, `nielbuys/framework`, `pocketarc/codeigniter`), FriendsOfPHP DB (no commits under `codeigniter/` since 2026-07-01), Packagist security-advisories API for every package in `composer.lock` (equivalent of `composer audit`), NVD keyword search for CVEs published 2026-07-01 to 2026-10-07, Snyk, web search | No new framework advisory. Added the previously unlisted CVE-2018-12071 (inherited fix) and CVE-2024-41344's ID. New CVEs are CI4 / CI4-app / app-level; one CI4 counterpart (`is_https()`) recorded as low. PHPUnit lock affected but not exploitable. OpenCVE not checked (needs an account); NVD covers the same CVE data. |
 
 ## Reporting a vulnerability
 

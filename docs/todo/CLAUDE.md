@@ -26,6 +26,8 @@ without re-doing the investigation.
 
 Convert relative dates to absolute. Update `Status` when the work lands.
 
+Once `Status` is final (applied or rejected), move the file to `archive/`.
+
 ## Voice
 
 Write for any reader, not for the person who requested the review.

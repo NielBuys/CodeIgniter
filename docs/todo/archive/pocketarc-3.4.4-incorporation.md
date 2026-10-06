@@ -3,7 +3,10 @@
 **Release:** https://github.com/pocketarc/codeigniter/releases/tag/3.4.4 (commit `fb57d35`, 18 Jul)
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-08-21
-**Status:** Not actioned. One functional gap (#48), one test gap (#50).
+**Status:** Applied 2026-10-06 in `7d676952c` — `is_array()` guard
+(section 2) and `test_edge()` (section 5). Key change deferred; see section 6.
+**Verdict:** Two items already present; the deprecation guard and the Edge test were
+the only gaps, and both are now in place.
 
 ---
 
@@ -75,6 +78,16 @@ elseif ($file[0] !== '.')
 ```
 
 This guards the assignment while preserving the existing basename keys.
+
+**Decided: applied as above** in
+[file_helper.php:251-258](system/helpers/file_helper.php#L251-L258). Entries for
+which `get_file_info()` fails are now omitted from the result rather than stored
+as `FALSE`.
+
+No unit test was added. `get_dir_file_info()` calls `realpath()` on its first
+call, which does not resolve `vfs://` paths, and a dangling symlink on the real
+filesystem needs elevated privileges on Windows. The existing `file_helper` tests
+pass.
 
 ### PR #48 is not directly applicable — two obstacles
 
@@ -157,17 +170,32 @@ Porting it is worthwhile: it pins ordering behaviour that is easy to break by
 editing `user_agents.php`. The expected legacy label needs adjusting to
 `Edge Legacy (Spartan)` to match the local config.
 
+**Decided: ported** as `test_edge()` in
+[Useragent_test.php](tests/codeigniter/libraries/Useragent_test.php), covering all
+three agent strings in the table above (browser label and version).
+
+### `is_browser()` takes the key, not the label
+
+Found while writing the test.
+[User_agent.php:431](system/libraries/User_agent.php#L431) compares
+`$this->browsers[$key]` against the detected label, so the argument is the
+**config key**. For Chromium Edge, `is_browser('Edg')` is `TRUE` and
+`is_browser('Edge')` is `FALSE`, because the `Edge` key maps to the legacy label.
+Callers that test for modern Edge with `is_browser('Edge')` get the wrong answer.
+This behaviour is inherited from upstream and is not changed here; the test
+asserts `is_browser('Edg')` to document it.
+
 ---
 
 ## 6. Recommended order of work
 
 1. **Add the `is_array()` guard in `get_dir_file_info()`** — the only functional
    gap. Small, no BC break, and it clears a PHP 8.1 deprecation that becomes
-   fatal under PHP 9.
+   fatal under PHP 9. **Done.**
 2. **Port `test_edge()`** — inexpensive regression protection for behaviour that
-   is already correct.
+   is already correct. **Done.**
 3. **Defer** the basename-to-relative-path key change. It fixes a real collision
-   defect but breaks the array contract; decide separately.
+   defect but breaks the array contract; decide separately. **Deferred.**
 
 Nothing in 3.4.4 requires the Edge configuration or `write_log` changes; both are
 already in place.

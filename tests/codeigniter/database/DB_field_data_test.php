@@ -64,8 +64,8 @@ class DB_field_data_test extends CI_TestCase {
 	{
 		$fields = $this->_by_name($this->db->get('nullability')->field_data());
 
-		$reports = ($this->db->dbdriver === 'mysqli')
-			OR ($this->db->dbdriver === 'pdo' && $this->db->subdriver === 'mysql');
+		$reports = ($this->db->dbdriver === 'mysqli'
+			OR ($this->db->dbdriver === 'pdo' && $this->db->subdriver === 'mysql'));
 
 		$this->assertSame($reports ? 0 : 1, $fields['id']->is_nullable);
 		$this->assertSame($reports ? 0 : 1, $fields['required']->is_nullable);

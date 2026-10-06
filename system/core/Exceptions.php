@@ -170,6 +170,21 @@ class CI_Exceptions {
 		else
 		{
 			set_status_header($status_code);
+
+			// Escape user-controllable content to prevent reflected XSS
+			// in error messages (e.g. failed view includes, SQL errors).
+			if (is_array($message))
+			{
+				foreach ($message as &$value)
+				{
+					$value = htmlspecialchars($value);
+				}
+			}
+			else
+			{
+				$message = htmlspecialchars($message);
+			}
+
 			$message = '<p>'.(is_array($message) ? implode('</p><p>', $message) : $message).'</p>';
 			$template = 'html'.DIRECTORY_SEPARATOR.$template;
 		}
@@ -199,6 +214,13 @@ class CI_Exceptions {
 		if (empty($message))
 		{
 			$message = '(null)';
+		}
+
+		// Escape the message to prevent reflected XSS when an exception
+		// message contains user-controllable content.
+		if ( ! is_cli())
+		{
+			$message = htmlspecialchars($message);
 		}
 
 		if (is_cli())

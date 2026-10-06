@@ -2,7 +2,8 @@
 Downloading CodeIgniter
 #######################
 
--  `CodeIgniter v3.1.13-dev (Current version) <https://codeload.github.com/bcit-ci/CodeIgniter/zip/3.1-stable>`_
+-  `CodeIgniter v3.1.24 (Current version) <https://codeload.github.com/NielBuys/CodeIgniter/zip/3.1.24>`_
+-  `Earlier NielBuys/CodeIgniter releases <https://github.com/NielBuys/CodeIgniter/releases>`_
 -  `CodeIgniter v3.1.12 <https://codeload.github.com/bcit-ci/CodeIgniter/zip/3.1.12>`_
 -  `CodeIgniter v3.1.11 <https://codeload.github.com/bcit-ci/CodeIgniter/zip/3.1.11>`_
 -  `CodeIgniter v3.1.10 <https://codeload.github.com/bcit-ci/CodeIgniter/zip/3.1.10>`_

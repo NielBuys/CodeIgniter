@@ -122,4 +122,27 @@ class UserAgent_test extends CI_TestCase {
 		$this->assertTrue($this->agent->is_mobile('android'));
 	}
 
+	// --------------------------------------------------------------------
+
+	public function test_edge()
+	{
+		// Chromium-based Edge (desktop) - must not be reported as Chrome
+		$this->agent->parse('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59');
+		$this->assertEquals('Edge', $this->agent->browser());
+		$this->assertEquals('91.0.864.59', $this->agent->version());
+		// is_browser() takes the config key, not the label
+		$this->assertTrue($this->agent->is_browser('Edg'));
+		$this->assertFalse($this->agent->is_browser('Chrome'));
+
+		// Legacy EdgeHTML (Spartan)
+		$this->agent->parse('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363');
+		$this->assertEquals('Edge Legacy (Spartan)', $this->agent->browser());
+		$this->assertEquals('18.18363', $this->agent->version());
+
+		// Chromium-based Edge (Android)
+		$this->agent->parse('Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 EdgA/120.0.0.0');
+		$this->assertEquals('Edge', $this->agent->browser());
+		$this->assertEquals('120.0.0.0', $this->agent->version());
+	}
+
 }

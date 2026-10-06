@@ -2,6 +2,231 @@
 Change Log
 ##########
 
+Releases from 3.1.13.1 onwards are made by the `NielBuys/CodeIgniter <https://github.com/NielBuys/CodeIgniter>`_
+fork. Issue numbers without a prefix refer to the original
+`bcit-ci/CodeIgniter <https://github.com/bcit-ci/CodeIgniter>`_ repository; ``pocketarc #N`` refers to
+`pocketarc/codeigniter <https://github.com/pocketarc/codeigniter>`_.
+
+Version 3.1.24
+==============
+
+Release Date: Not Released
+
+-  General Changes
+
+   -  Added method ``set_callback_object()`` to :doc:`Form Validation Library <libraries/form_validation>` to resolve ``callback_`` rules against an object other than the controller, without overwriting ``$CI``.
+   -  Added ``create_sid()`` to the :doc:`Session Library <libraries/sessions>` handler wrapper for PHP 8.6, which deprecates handlers without it.
+   -  Added ``text/plain`` to the ``json`` entry in *application/config/mimes.php*, as ``finfo`` on Windows detects JSON files that way (pocketarc #57). Existing applications keep their own *mimes.php*.
+
+-  **Security**
+
+   -  Escaped error and exception messages in HTML output to prevent reflected XSS when they contain user-controllable content (PR #6113).
+
+Bug fixes for 3.1.24
+====================
+
+-  Fixed a bug (pocketarc #51) - :doc:`Text Helper <helpers/text_helper>` function :php:func:`highlight_code()` left a stray ``?>`` at the end of its output on PHP 8.3+, visible on every query in the :doc:`Profiler <general/profiling>`.
+-  Fixed a bug (pocketarc #47) - :doc:`File Helper <helpers/file_helper>` function :php:func:`get_dir_file_info()` raised a PHP 8.1 "automatic conversion of false to array" deprecation for entries ``get_file_info()`` cannot read, such as broken symlinks. Such entries are now skipped.
+
+Version 3.1.23
+==============
+
+Release Date: Jun 23, 2026
+
+-  General Changes
+
+   -  Added detection of Chromium-based Edge (``Edg``) to the :doc:`User Agent Library <libraries/user_agent>`; the older EdgeHTML browser is now reported as ``Edge Legacy (Spartan)``.
+   -  Added ``#[AllowDynamicProperties]`` to ``CI_Model`` (pocketarc #25).
+
+Bug fixes for 3.1.23
+====================
+
+-  Fixed a bug - ``CI_Log::write_log()`` returned an undefined ``$result`` when no log line was written.
+-  Fixed a bug (pocketarc #23) - :doc:`Query Builder <database/query_builder>` method ``order_by()`` raised PHP 8.1+ deprecations when given ``NULL``.
+-  Fixed a bug (pocketarc #24) - :doc:`Query Builder <database/query_builder>` method ``join()`` raised PHP 8.1+ deprecations when given ``NULL``.
+-  Fixed a bug (pocketarc #29) - :doc:`Encryption Library <libraries/encryption>` methods ``encrypt()`` and ``decrypt()`` failed on ``NULL`` data.
+-  Fixed a bug (pocketarc #32) - :doc:`Database Library <database/index>` 'mysqli' driver used ``MYSQLI_TYPE_INTERVAL``, deprecated in PHP 8.4.
+
+Version 3.1.22
+==============
+
+Release Date: Dec 10, 2025
+
+Bug fixes for 3.1.22
+====================
+
+-  Fixed a bug - :doc:`Profiler <general/profiling>` raised dynamic property deprecations on PHP 8.2+.
+
+Version 3.1.21
+==============
+
+Release Date: Oct 29, 2025
+
+-  General Changes
+
+   -  Added PHP 8.5 to the test matrix.
+   -  Added support for PHPUnit 10 and 11 to the test suite.
+
+Bug fixes for 3.1.21
+====================
+
+-  Fixed a bug - :doc:`Database Library <database/index>` 'pdo/mysql' driver used ``PDO::MYSQL_ATTR_*`` constants, deprecated in PHP 8.5; ``Pdo\Mysql`` constants are now used on PHP 8.4+.
+-  Fixed a bug - :doc:`Image Manipulation Library <libraries/image_lib>`, :doc:`CAPTCHA Helper <helpers/captcha_helper>`, :doc:`File Uploading Library <libraries/file_uploading>` and :doc:`XML-RPC Library <libraries/xmlrpc>` called resource close and free functions deprecated in PHP 8.5.
+-  Fixed a bug - :doc:`Language Library <libraries/language>` method ``line()`` did not cast its key to a string.
+
+Version 3.1.20
+==============
+
+Release Date: Oct 14, 2025
+
+Bug fixes for 3.1.20
+====================
+
+-  Fixed a bug - :doc:`Session Library <libraries/sessions>` handler wrapper had a syntax error in ``updateTimestamp()``.
+
+Version 3.1.19
+==============
+
+Release Date: Jun 4, 2025
+
+-  **Security**
+
+   -  Changed ``xss_clean()`` in the :doc:`Security Class <libraries/security>` to decode only known malicious URL-encoded characters (``<``, ``>``, ``"``, ``'``, ``=``, ``(``, ``)``, ``/``, ``\``, ``;``) instead of fully URL-decoding the input, so that legitimate ``%`` sequences are no longer altered.
+
+Bug fixes for 3.1.19
+====================
+
+-  Fixed a bug (PR #6140) - :doc:`Cookie Helper <helpers/cookie_helper>` function :php:func:`set_cookie()` did not accept the ``$samesite`` argument.
+
+Version 3.1.18
+==============
+
+Release Date: Feb 13, 2025
+
+Bug fixes for 3.1.18
+====================
+
+-  Fixed a bug - :doc:`Pagination Library <libraries/pagination>` passed ``NULL`` to ``ctype_digit()`` when the page URI segment was missing.
+
+Version 3.1.17
+==============
+
+Release Date: Dec 20, 2024
+
+-  General Changes
+
+   -  Added PHP 8.4 to the test matrix.
+   -  Removed the pre-PHP 7.1 session ID length calculation from the :doc:`Session Library <libraries/sessions>`.
+   -  Stopped setting the deprecated ``mbstring.internal_encoding``, ``iconv.internal_encoding`` and ``php.internal_encoding`` ini options on startup.
+   -  Updated *composer.json* for the fork: homepage, support links, PHPUnit 9 - 11 and a PHP 7.4 platform.
+
+Bug fixes for 3.1.17
+====================
+
+-  Fixed a bug (#6306) - PHP 8.4 deprecation notices, including implicitly nullable parameters in the :doc:`Encryption Library <libraries/encryption>` and ``E_STRICT`` use in the error handler.
+-  Fixed a bug (PR #6264) - :doc:`XML-RPC Library <libraries/xmlrpc>` was not compatible with PHP 8.
+-  Fixed a bug - ``ctype_digit()`` was passed non-string values in the :doc:`Database Library <database/index>` and :doc:`Form Validation Library <libraries/form_validation>`.
+
+Version 3.1.16
+==============
+
+Release Date: May 10, 2024
+
+-  General Changes
+
+   -  Added WebP support to the :doc:`Image Manipulation Library <libraries/image_lib>`, and the ``image/webp`` MIME type.
+
+Version 3.1.15
+==============
+
+Release Date: Feb 28, 2024
+
+-  General Changes
+
+   -  Raised the minimum PHP version to 7.4.
+   -  Fixed the test suite so that all GitHub Actions jobs pass.
+
+Version 3.1.14
+==============
+
+Release Date: Feb 28, 2024
+
+Includes the 3.1.14-dev pre-release of Nov 3, 2023, which merged fixes from the original CodeIgniter ``develop`` branch.
+
+Bug fixes for 3.1.14
+====================
+
+-  Fixed a bug (#6134) - :doc:`Security Class <libraries/security>` URL-encoded the slashes in the CSRF cookie path.
+-  Fixed a bug (#6159) - :doc:`Input Library <libraries/input>` method ``set_cookie()`` ignored ``samesite`` when the cookie parameters were passed as an array.
+-  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver did not parse the ``auth``, ``database``, ``timeout`` and ``prefix`` options from the save path; :doc:`Caching Library <libraries/caching>` 'redis' driver gained a ``database`` option.
+-  Fixed a bug (#6175) - ``CI_Router`` treated an empty ``$directory`` as an override.
+-  Fixed a bug (#6201) - :doc:`Pagination Library <libraries/pagination>` passed a non-string to ``ctype_digit()``.
+-  Fixed a bug (#6149) - :doc:`Query Builder <database/query_builder>` and :doc:`XML-RPC Library <libraries/xmlrpc>` used string interpolation syntax deprecated in PHP 8.2.
+
+Version 3.1.13.6
+================
+
+Release Date: Jul 11, 2023
+
+Bug fixes for 3.1.13.6
+======================
+
+-  Fixed a bug - :doc:`CAPTCHA Helper <helpers/captcha_helper>` function :php:func:`create_captcha()` passed floats to GD functions on PHP 8.
+-  Fixed a bug - PHP 8.1 deprecations from ``NULL`` arguments in ``remove_invisible_characters()`` and ``CI_URI::ruri_string()``.
+
+Version 3.1.13.5
+================
+
+Release Date: Jul 11, 2023
+
+-  General Changes
+
+   -  Raised the minimum PHP version to 7.2.
+
+Bug fixes for 3.1.13.5
+======================
+
+-  Fixed a bug - PHP 8.x compatibility fixes in the :doc:`Text Helper <helpers/text_helper>` and :doc:`XML-RPC Library <libraries/xmlrpc>`.
+
+Version 3.1.13.4
+================
+
+Release Date: Jul 3, 2023
+
+Bug fixes for 3.1.13.4
+======================
+
+-  Fixed a bug - :doc:`Database Forge <database/forge>` 'postgre' and 'pdo/pgsql' drivers set a dynamic property on PHP 8.2; ``CREATE TABLE IF NOT EXISTS`` is now always used.
+
+Version 3.1.13.3
+================
+
+Release Date: Mar 16, 2023
+
+Bug fixes for 3.1.13.3
+======================
+
+-  Fixed a bug - PHP 8.2 dynamic property deprecations: declared ``CI_Router::$uri`` and :doc:`Image Manipulation Library <libraries/image_lib>` property ``$dest_image``.
+
+Version 3.1.13.2
+================
+
+Release Date: Mar 15, 2023
+
+-  General Changes
+
+   -  Renamed the Composer package to ``nielbuys/framework``.
+   -  Added ``#[AllowDynamicProperties]`` to ``CI_Controller``.
+
+Version 3.1.13.1
+================
+
+Release Date: Mar 14, 2023
+
+-  General Changes
+
+   -  Added PHP 8.2 support: ``#[AllowDynamicProperties]`` on ``CI_Loader``, ``CI_DB_driver`` and ``CI_Driver_Library``, a declared ``CI_URI::$config``, and no dynamic property in the :doc:`HTML Table Class <libraries/table>`.
+
 Version 3.1.13
 ==============
 

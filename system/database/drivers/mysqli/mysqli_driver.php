@@ -491,6 +491,7 @@ class CI_DB_mysqli_driver extends CI_DB {
 
 			$retval[$i]->default		= $query[$i]->Default;
 			$retval[$i]->primary_key	= (int) ($query[$i]->Key === 'PRI');
+			$retval[$i]->is_nullable	= (int) ($query[$i]->Null === 'YES');
 		}
 
 		return $retval;

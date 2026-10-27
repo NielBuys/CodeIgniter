@@ -108,6 +108,7 @@ class CI_DB_sqlite3_result extends CI_DB_result {
 			$retval[$i]->type		= isset($data_types[$type]) ? $data_types[$type] : $type;
 
 			$retval[$i]->max_length		= NULL;
+			$retval[$i]->is_nullable	= 1; // Not reported by this driver
 		}
 
 		return $retval;

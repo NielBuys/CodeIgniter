@@ -100,6 +100,7 @@ class CI_DB_ibase_result extends CI_DB_result {
 			$retval[$i]->name		= $info['name'];
 			$retval[$i]->type		= $info['type'];
 			$retval[$i]->max_length		= $info['length'];
+			$retval[$i]->is_nullable	= 1; // Not reported by this driver
 		}
 
 		return $retval;

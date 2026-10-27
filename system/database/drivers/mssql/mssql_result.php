@@ -116,6 +116,7 @@ class CI_DB_mssql_result extends CI_DB_result {
 			$retval[$i]->name	= $field->name;
 			$retval[$i]->type	= $field->type;
 			$retval[$i]->max_length	= $field->max_length;
+			$retval[$i]->is_nullable	= 1; // Not reported by this driver
 		}
 
 		return $retval;

@@ -141,6 +141,7 @@ class CI_DB_sqlsrv_result extends CI_DB_result {
 			$retval[$i]->name	= $field['Name'];
 			$retval[$i]->type	= $field['Type'];
 			$retval[$i]->max_length	= $field['Size'];
+			$retval[$i]->is_nullable	= (int) ( ! isset($field['Nullable']) OR $field['Nullable'] !== SQLSRV_NULLABLE_NO);
 		}
 
 		return $retval;

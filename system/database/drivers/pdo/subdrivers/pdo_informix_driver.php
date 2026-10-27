@@ -234,9 +234,19 @@ class CI_DB_pdo_informix_driver extends CI_DB_pdo_driver {
 				AND LOWER("systables"."tabname") = '.$this->escape(strtolower($table)).'
 			ORDER BY "syscolumns"."colno"';
 
-		return (($query = $this->query($sql)) !== FALSE)
-			? $query->result_object()
-			: FALSE;
+		if (($query = $this->query($sql)) === FALSE)
+		{
+			return FALSE;
+		}
+		$query = $query->result_object();
+
+		// Not reported by this driver
+		for ($i = 0, $c = count($query); $i < $c; $i++)
+		{
+			$query[$i]->is_nullable = 1;
+		}
+
+		return $query;
 	}
 
 	// --------------------------------------------------------------------

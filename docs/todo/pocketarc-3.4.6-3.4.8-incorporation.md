@@ -81,8 +81,8 @@ running PHP 8.5.4.
 
 Commit `c0aa214b9` ("Fixes #6164", first released in 3.1.14) brought part of the
 upstream `develop` fix for #6164 into the Redis session driver, but not the part
-that creates `$save_path`. The result, at
-[Session_redis_driver.php:155-171](system/libraries/Session/drivers/Session_redis_driver.php#L155-L171):
+that creates `$save_path`. The result, in the constructor before the fix
+(lines 155-171 at `e76cae2ec`):
 
 ```php
 if ($this->_config['match_ip'] === TRUE)
@@ -104,10 +104,9 @@ if ($this->_config['match_ip'] === TRUE)
 
 `$save_path` is not assigned anywhere else in the constructor. With
 `sess_match_ip = TRUE`, the constructor raises an undefined-variable warning
-and overwrites the parsed host, port, password and database with `NULL`. `open()`
-then fails at
-[Session_redis_driver.php:188](system/libraries/Session/drivers/Session_redis_driver.php#L188)
-with "No Redis save path configured", and no session can start. With
+and overwrites the parsed host, port, password and database with `NULL`.
+`open()` then returns failure at its `empty($this->_config['save_path'])` check,
+without logging anything, and no session can start. With
 `sess_match_ip = FALSE` (the template default,
 [config.php:391](application/config/config.php#L391)) the block is skipped and
 nothing is wrong.
@@ -122,7 +121,7 @@ if ($this->_config['match_ip'] === TRUE)
 ```
 
 `auth`, `database`, `timeout` and `prefix` are already parsed above it
-([Session_redis_driver.php:137-148](system/libraries/Session/drivers/Session_redis_driver.php#L137-L148)),
+([Session_redis_driver.php:137-150](system/libraries/Session/drivers/Session_redis_driver.php#L137-L150)),
 so nothing is lost. Best done in the same change as section 3, which rewrites the
 lines above.
 
@@ -144,33 +143,40 @@ Found during review of the fix above. Also **local to this repository**.
 
 Upstream #6164 ("FLOAT error when TIMEOUT is null on Redis 6.x") changed the
 session driver's default `timeout` from `NULL` to `0.0`. `c0aa214b9` placed that
-hunk in the `match_ip` block, where it never ran. The parser that does run still
-defaults to `NULL`, at
-[Session_redis_driver.php:145](system/libraries/Session/drivers/Session_redis_driver.php#L145):
+hunk in the `match_ip` block, where it never ran. The parser that did run kept
+defaulting `timeout`, and `port`, to `NULL`:
 
 ```php
+'port' => empty($matches[2]) ? NULL : $matches[2],
+…
 'timeout' => preg_match('#timeout=(\d+\.\d+)#', $matches[3], $match) ? (float) $match[1] : NULL
 ```
 
-A save path without `timeout=N.N`, which is most of them, makes `open()` call
-`Redis::connect($host, $port, NULL)`
-([Session_redis_driver.php:180](system/libraries/Session/drivers/Session_redis_driver.php#L180)).
-With a typed phpredis (6.x) on PHP 8.1+ that passes `NULL` to a `float`
-parameter: deprecated now, an error in PHP 9. `port` is `NULL` in the same way
-when the save path gives no port. Not reproduced here; phpredis is not installed
-locally.
+A save path without `timeout=N.N` or a port, which is most of them, made `open()`
+call `Redis::connect($host, NULL, NULL)`
+([Session_redis_driver.php:182](system/libraries/Session/drivers/Session_redis_driver.php#L182)).
+phpredis 5.x and 6.x both declare those parameters as non-nullable `int` and
+`float`, so on PHP 8.1+ this is deprecated, and an error in PHP 9. Not
+reproduced here; phpredis is not installed locally.
 
-The 3.1.14 changelog entry for #6164
-([changelog.rst:180](user_guide_src/source/changelog.rst#L180)) is inaccurate in
-two ways. The session driver already parsed `auth`, `database`, `timeout` and
-`prefix` before 3.1.14, and the parsing it claims was added never ran. The cache
-driver's new `database` option
+The connection itself was unaffected. phpredis treats a port of `0` (what `NULL`
+became) as `6379` for a network host, and as "unix socket" for a host starting
+with `/` (`redis_sock_server_open()` in phpredis 5.3.7, 6.0.2 and `develop`).
+
+The 3.1.14 changelog entry for #6164 was also inaccurate. It said the session
+driver gained parsing of `auth`, `database`, `timeout` and `prefix`, which it
+already had, and that the cache driver gained a `database` option. That option
 ([Cache_redis.php:64](system/libraries/Cache/drivers/Cache_redis.php#L64)) is
 never read, because there is no `select()` call.
 
+A separate, older quirk was left unchanged: the parser accepts only
+`timeout=N.N`, so `timeout=5` is ignored and the default applies.
+
 **Decided: fixed** in `929f65182`, on the same branch as the `sess_match_ip` fix.
 `timeout` now defaults to `0.0`, and `port` to `6379`, or `0` for a save path that
-starts with `/` (a unix socket, as before). The 3.1.14 changelog entry now says
+starts with `/` (a unix socket, as before). A given port is cast to `int`. The
+connection behaves as before; only the deprecation goes away. The 3.1.14
+changelog entry now says
 what actually changed, and the 3.1.25 entry records the session fix. The cache
 `database` default is left unused. Implementing it would be a new feature, not
 part of #6164.
@@ -197,13 +203,14 @@ constructor, which has a `unix://` branch, a named `options` group and a
 `$save_path` array. None of those exist here. The equivalent change for this tree:
 
 ```php
-// before — Session_redis_driver.php:137-141
+// before — Session_redis_driver.php:137-144
 elseif (preg_match('#(?:tcp://)?([^:?]+)(?:\:(\d+))?(\?.+)?#', $this->_config['save_path'], $matches))
 {
 	isset($matches[3]) OR $matches[3] = '';
 	$this->_config['save_path'] = array(
 		'host' => $matches[1],
-		'port' => empty($matches[2]) ? NULL : $matches[2],
+		…
+		'port' => empty($matches[2]) ? ($matches[1][0] === '/' ? 0 : 6379) : (int) $matches[2],
 
 // after
 elseif (preg_match('#^(?:(tcp|tls|ssl)://)?([^:?]+)(?:\:(\d+))?(\?.+)?#i', $this->_config['save_path'], $matches))
@@ -213,10 +220,14 @@ elseif (preg_match('#^(?:(tcp|tls|ssl)://)?([^:?]+)(?:\:(\d+))?(\?.+)?#i', $this
 	$this->_config['save_path'] = array(
 		// phpredis needs tls:// or ssl:// in the host to enable encryption
 		'host' => (in_array($scheme, array('tls', 'ssl'), TRUE) ? $scheme.'://' : '').$matches[2],
-		'port' => empty($matches[3]) ? NULL : $matches[3],
+		'port' => empty($matches[3]) ? ($matches[2][0] === '/' ? 0 : 6379) : (int) $matches[3],
 ```
 
-Every later `$matches[3]` becomes `$matches[4]`.
+Every later `$matches[3]` becomes `$matches[4]`. The socket check tests the bare
+host, `$matches[2]`, not the composed `tls://…` value. Keep the section 2 port and
+timeout defaults; the existing tests in
+[Session_redis_driver_test.php](tests/codeigniter/libraries/Session_redis_driver_test.php)
+fail if they are lost.
 
 **Backward compatibility.** Additive. `tcp://` and bare host paths parse as
 before. Paths that start with `tls://` or `ssl://` worked before only by

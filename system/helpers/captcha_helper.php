@@ -122,8 +122,10 @@ if ( ! function_exists('create_captcha'))
 		$current_dir = @opendir($img_path);
 		while ($filename = @readdir($current_dir))
 		{
-			if (in_array(substr($filename, -4), array('.jpg', '.png'))
-				&& (str_replace(array('.jpg', '.png'), '', $filename) + $expiration) < $now)
+			// Only captcha images: a 10-digit timestamp, optionally with a fraction. A comma separator
+			// may exist in files written by PHP < 8.0 under a locale such as de_DE.
+			if (preg_match('#^(?<ts>\d{10}(?:[.,]\d+)?)\.(?:png|jpg)$#', $filename, $match)
+				&& ((float) strtr($match['ts'], ',', '.') + $expiration) < $now)
 			{
 				@unlink($img_path.$filename);
 			}

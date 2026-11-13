@@ -15,7 +15,6 @@ Release Date: Not Released
 -  General Changes
 
    -  Added an ``is_nullable`` property to :doc:`Database Metadata <database/metadata>` method ``field_data()`` (#6335). It is set by every driver; those that cannot report nullability return 1.
-   -  Added ``tls://`` and ``ssl://`` save paths to the :doc:`Session Library <libraries/sessions>` 'redis' driver, for Redis servers that require TLS (pocketarc #66). Requires phpredis 5.0 or later. The scheme is no longer case-sensitive.
 
 Bug fixes for 3.1.25
 ====================
@@ -23,9 +22,6 @@ Bug fixes for 3.1.25
 -  Fixed a bug (#6337) - :doc:`Form Validation Library <libraries/form_validation>` treated a blank array-notation field (e.g. ``address[city]``) as not submitted, so ``set_value()`` repopulated it with the default. Array-notation fields now behave like plain fields.
 
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
-
--  Fixed a bug where the :doc:`Session Library <libraries/sessions>` 'redis' driver lost its ``sess_save_path`` when ``sess_match_ip`` was enabled, so no session could start. Introduced in 3.1.14.
--  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver passed ``NULL`` as the port and timeout to ``Redis::connect()`` when ``sess_save_path`` did not set them, which is deprecated on PHP 8.1+. They now default to ``6379`` (``0`` for a unix socket path) and ``0.0``.
 
 Version 3.1.24
 ==============
@@ -179,7 +175,7 @@ Bug fixes for 3.1.14
 
 -  Fixed a bug (#6134) - :doc:`Security Class <libraries/security>` URL-encoded the slashes in the CSRF cookie path.
 -  Fixed a bug (#6159) - :doc:`Input Library <libraries/input>` method ``set_cookie()`` ignored ``samesite`` when the cookie parameters were passed as an array.
--  Changed the :doc:`Caching Library <libraries/caching>` 'redis' driver default ``timeout`` from ``0`` to ``0.0`` (#6164). The :doc:`Session Library <libraries/sessions>` part of #6164, a ``NULL`` timeout passed to ``Redis::connect()``, did not take effect until 3.1.25.
+-  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver did not parse the ``auth``, ``database``, ``timeout`` and ``prefix`` options from the save path; :doc:`Caching Library <libraries/caching>` 'redis' driver gained a ``database`` option.
 -  Fixed a bug (#6175) - ``CI_Router`` treated an empty ``$directory`` as an override.
 -  Fixed a bug (#6201) - :doc:`Pagination Library <libraries/pagination>` passed a non-string to ``ctype_digit()``.
 -  Fixed a bug (#6149) - :doc:`Query Builder <database/query_builder>` and :doc:`XML-RPC Library <libraries/xmlrpc>` used string interpolation syntax deprecated in PHP 8.2.

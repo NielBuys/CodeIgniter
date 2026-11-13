@@ -23,16 +23,6 @@ Bug fixes for 3.1.25
 
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
--  Fixed a bug where :doc:`Database Forge <database/forge>` method ``modify_column()`` for PostgreSQL ('postgre' and 'pdo/pgsql') set a column comment on the old column name after renaming it, so the statement failed (pocketarc #68).
--  Fixed a bug where the :doc:`Image Manipulation Library <libraries/image_lib>` GD driver lost the transparency of WebP images when resizing or cropping; it was kept for PNG only (pocketarc #71).
--  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` function ``create_captcha()`` threw a ``TypeError`` on PHP 8 when the image folder held a ``.jpg`` or ``.png`` file whose name is not a timestamp. Expired-image clean-up now only touches captcha images, including those named with a comma decimal separator (pocketarc #74).
-
-   .. note:: On PHP 7, other ``.jpg`` and ``.png`` files in the captcha folder (e.g. ``logo.png``) used to be deleted by this clean-up. They are now kept on every PHP version.
-
--  Fixed a bug where :doc:`Logging <general/errors>` passed a float timestamp to ``date()`` when ``log_date_format`` contains microseconds (``u``), a deprecation on PHP 8.1+ (pocketarc #72).
--  Fixed a bug where :doc:`Input Library <libraries/input>` method ``set_cookie()`` passed a ``NULL`` value to ``setcookie()``, a deprecation on PHP 8.1+. ``NULL`` is now sent as an empty string, as before (pocketarc #62).
--  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` function ``create_captcha()`` passed fractional bounds to ``mt_rand()`` when placing the text, a deprecation on PHP 8.1+ for most word lengths and odd image heights.
-
 Version 3.1.24
 ==============
 

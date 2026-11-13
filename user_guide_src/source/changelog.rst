@@ -23,9 +23,6 @@ Bug fixes for 3.1.25
 
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
--  Fixed a bug where :doc:`Form Validation Library <libraries/form_validation>` method ``set_rules()`` kept a ``NULL`` label instead of falling back to the field name, so error messages showed no name and PHP 8.1+ raised a deprecation (pocketarc #75).
--  Fixed a bug where :doc:`Encryption Library <libraries/encryption>` method ``decrypt()`` passed ``NULL`` to ``base64_decode()`` when HMAC was disabled, a deprecation on PHP 8.1+. ``encrypt()`` and ``decrypt()`` now treat ``NULL`` as an empty string (pocketarc #86).
-
 Version 3.1.24
 ==============
 

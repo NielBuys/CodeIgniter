@@ -5,7 +5,8 @@ https://github.com/pocketarc/codeigniter/releases/tag/3.4.7 (2026-11-02),
 https://github.com/pocketarc/codeigniter/releases/tag/3.4.8 (2026-11-08)
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-11-13
-**Status:** Not actioned.
+**Status:** Section 2 applied 2026-11-13 in `f69a69e55` (branch
+`tasks/redis-session-match-ip`), with constructor tests. The rest is not actioned.
 **Verdict:** Six changes apply here, all small: Redis session TLS, the PostgreSQL
 column comment after a rename, WebP transparency, the captcha clean-up crash on
 PHP 8, a `NULL` cookie value and a float passed to `date()` in the logger. Scoping
@@ -128,6 +129,48 @@ lines above.
 by hand against a Redis server, or by a unit test that checks
 `$this->_config['save_path']` after construction (the constructor does not
 connect).
+
+**Decided: fixed** in `f69a69e55`, restoring the 3.1-stable block. The driver
+file is now identical to its state before `c0aa214b9`. The removed
+`isset($matches['options'])` branch never ran: the 3.1 regex has no named
+`options` group. Tests in
+[Session_redis_driver_test.php](tests/codeigniter/libraries/Session_redis_driver_test.php)
+fail on the old code and pass on the fix.
+
+### Related, not yet fixed: the #6164 timeout default was never applied
+
+Found during review of the fix above. Also **local to this repository**.
+
+Upstream #6164 ("FLOAT error when TIMEOUT is null on Redis 6.x") changed the
+session driver's default `timeout` from `NULL` to `0.0`. `c0aa214b9` placed that
+hunk in the `match_ip` block, where it never ran. The parser that does run still
+defaults to `NULL`, at
+[Session_redis_driver.php:145](system/libraries/Session/drivers/Session_redis_driver.php#L145):
+
+```php
+'timeout' => preg_match('#timeout=(\d+\.\d+)#', $matches[3], $match) ? (float) $match[1] : NULL
+```
+
+A save path without `timeout=N.N`, which is most of them, makes `open()` call
+`Redis::connect($host, $port, NULL)`
+([Session_redis_driver.php:180](system/libraries/Session/drivers/Session_redis_driver.php#L180)).
+With a typed phpredis (6.x) on PHP 8.1+ that passes `NULL` to a `float`
+parameter: deprecated now, an error in PHP 9. `port` is `NULL` in the same way
+when the save path gives no port. Not reproduced here; phpredis is not installed
+locally.
+
+The 3.1.14 changelog entry for #6164
+([changelog.rst:180](user_guide_src/source/changelog.rst#L180)) is inaccurate in
+two ways. The session driver already parsed `auth`, `database`, `timeout` and
+`prefix` before 3.1.14, and the parsing it claims was added never ran. The cache
+driver's new `database` option
+([Cache_redis.php:64](system/libraries/Cache/drivers/Cache_redis.php#L64)) is
+never read, because there is no `select()` call.
+
+**Fix.** Default `timeout` to `0.0`, and `port` to phpredis's default `6379`.
+Then either correct the 3.1.14 entry or record the real fix under 3.1.25.
+Implement the cache `database` option, or drop the claim. Best done with
+section 3, which rewrites the same lines.
 
 ---
 
@@ -424,7 +467,8 @@ parsed, but only for configurations that do not work today.
 
 ## 18. Recommended order of work
 
-1. **Fix the `sess_match_ip` defect and add TLS parsing** (§2, §3) in one
+1. **Fix the `sess_match_ip` defect** (§2). **Done in `f69a69e55`.** Then the
+   #6164 timeout default (end of §2) and **TLS parsing** (§3), in one
    change. The defect is local and breaks every Redis session with IP matching.
 2. **Port the PostgreSQL comment fix** with its test (§4).
 3. **Fix the captcha clean-up** (§6): a stray image in the folder takes the page

@@ -351,6 +351,35 @@ class Form_validation_test extends CI_TestCase {
 		$this->assertEquals('', $this->form_validation->error('req_field'));
 	}
 
+	/**
+	 * A NULL label falls back to the field name, like '' does. Before, it stayed
+	 * NULL, the message showed no name, and sscanf(NULL) raised a deprecation on
+	 * PHP 8.1+.
+	 */
+	public function test_set_rules_null_label()
+	{
+		$deprecations = array();
+		set_error_handler(function ($errno, $errstr) use (&$deprecations) {
+			$deprecations[] = $errstr;
+			return TRUE;
+		}, E_DEPRECATED);
+
+		try
+		{
+			$this->form_validation->set_message('required', 'The {field} field is required.');
+			$this->form_validation->set_rules('foo', NULL, 'required');
+			$this->form_validation->set_data(array('foo' => ''));
+			$this->form_validation->run();
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		$this->assertSame(array(), $deprecations);
+		$this->assertSame('<p>The foo field is required.</p>', $this->form_validation->error('foo'));
+	}
+
 	public function test_set_error_delimiters()
 	{
 		$prefix = '<div class="error">';

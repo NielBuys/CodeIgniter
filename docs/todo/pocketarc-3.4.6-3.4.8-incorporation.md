@@ -5,9 +5,9 @@ https://github.com/pocketarc/codeigniter/releases/tag/3.4.7 (2026-11-02),
 https://github.com/pocketarc/codeigniter/releases/tag/3.4.8 (2026-11-08)
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-11-13
-**Status:** Section 2 applied 2026-11-13 in `f69a69e55` (`sess_match_ip`) and
-`929f65182` (#6164 defaults), on branch `tasks/redis-session-match-ip`, with
-constructor tests. The rest is not actioned.
+**Status:** Sections 2–8 applied 2026-11-13, each with tests. Sections 2 and 3
+(Redis: `sess_match_ip`, #6164 defaults, TLS) are in PR #23; sections 4–8 are in
+PR #25. Optional sections 9–13 were not taken (**Decided: not now**, section 18).
 **Verdict:** Six changes apply here, all small: Redis session TLS, the PostgreSQL
 column comment after a rename, WebP transparency, the captcha clean-up crash on
 PHP 8, a `NULL` cookie value and a float passed to `date()` in the logger. Scoping
@@ -236,6 +236,18 @@ accident, if at all.
 **Tests.** As section 2: none exist; a constructor-level unit test is possible
 without a Redis server.
 
+**Decided: ported** in `e6091256a` (PR #23), with tests for `tls://`, `ssl://`,
+upper-case schemes and `tls://` without a port. Review follow-ups in `37844eaf4`:
+- A save path the regex cannot parse (for example one starting with `:`) is now
+  cleared, so `open()` fails cleanly instead of throwing a `TypeError` on PHP 8.
+- The changelog and `sessions.rst` note that `tls://` needs phpredis 5.0 or later;
+  4.x does not split the scheme from the host.
+
+Not done, recorded for later: there is no way to pass TLS certificate options.
+A server with a self-signed or private-CA certificate needs `openssl.cafile` in
+`php.ini`. phpredis 5.3+ accepts a stream context as the seventh `connect()`
+argument, which a future option could use.
+
 ---
 
 ## 4. PR #68 — PostgreSQL column comment after a rename — AFFECTED
@@ -262,6 +274,9 @@ old output could never succeed. **Tests:** pocketarc adds
 so this is covered. Check the test against this tree's mock database before
 copying it.
 
+**Decided: ported** in `e312a2a73` (PR #25), verbatim in both drivers, with
+pocketarc's test (static data provider) and an extra case for an unrenamed column.
+
 ---
 
 ## 5. PR #71 — WebP in `Image_lib` — PARTLY PRESENT
@@ -285,6 +300,12 @@ if ($this->image_type === 3 OR $this->image_type === 18)
 **Applicable verbatim** at the three lines. **Backward compatibility:** output
 change for transparent WebP only, and that is the fix. **Tests:** none for alpha
 handling here or in pocketarc.
+
+**Decided: ported** in `8cfdd88a8` (PR #25), with an `Image_lib_test` that resizes
+a transparent WebP and PNG. Review found that only resize and crop lost alpha:
+libgd's WebP writer keeps alpha regardless of `imagesavealpha()`, and the
+watermark methods draw on an image loaded with its alpha. The two watermark
+hunks therefore change nothing for WebP; they stay for consistency with PNG.
 
 ---
 
@@ -319,6 +340,21 @@ touched (before, they crashed or were deleted). **Tests:** pocketarc's
 `captcha_helper_test.php` additions are written for `develop`'s optional
 `img_path`; reuse the filename cases, not the file as a whole.
 
+**Decided: ported** in `a257aee02` (PR #25), without the `i` flag: matching stays
+case-sensitive and the filename stays `$now.'.jpg'`, as before. On PHP 7 the old
+code deleted any other `.jpg`/`.png` in the folder (`"logo" + 7200` is `7200`);
+the changelog has a note that they are now kept.
+
+### Pre-existing, not fixed: float passed to `mt_rand()`
+
+Found while testing section 6. Inherited from upstream, separate from pocketarc.
+With the default random 8-character word and no font, `create_captcha()` calls
+`mt_rand(0, $img_width / ($length / 3))`
+([captcha_helper.php:301](system/helpers/captcha_helper.php#L301)), which is
+`mt_rand(0, 56.25)`: "Implicit conversion from float to int loses precision" on
+PHP 8.1+, on every call. The font branch and the angle calculation have the same
+pattern for some word lengths. The captcha tests pass a fixed word to avoid it.
+
 ---
 
 ## 7. PR #62 — `NULL` cookie value — AFFECTED
@@ -334,6 +370,10 @@ setcookie($prefix.$name, $value === NULL ? '' : $value, $setcookie_options);
 
 **Applicable verbatim.** Behaviour is unchanged apart from the deprecation
 notice: `NULL` already produced an empty cookie value.
+
+**Decided: ported** in `3048c49a8` (PR #25). Headers cannot be inspected in this
+suite, so `Input_test::test_set_cookie_null_value` checks only that `CI_Input`
+raises no deprecation.
 
 ---
 
@@ -353,6 +393,11 @@ The rest of #72 does not apply: this repository already builds the daily filenam
 on every write ([Log.php:186](system/core/Log.php#L186)), and has no
 `log_filename` setting. That rotation fix and the `config.php` comment are for
 `develop`'s custom filename option.
+
+**Decided: ported** in `93504106d` (PR #25), with
+`Log_test::test_write_log_with_microseconds`. On PHP 8.6 vfsStream raises its own
+deprecation while the test writes, so the test counts only deprecations raised in
+`Log.php` (`9735899d1`).
 
 ---
 
@@ -482,14 +527,16 @@ parsed, but only for configurations that do not work today.
 ## 18. Recommended order of work
 
 1. **Fix the `sess_match_ip` defect and the #6164 defaults** (§2). **Done in
-   `f69a69e55` and `929f65182`.** Then **TLS parsing** (§3), which rewrites the
-   same parser lines.
-2. **Port the PostgreSQL comment fix** with its test (§4).
+   `f69a69e55` and `929f65182`.** Then **TLS parsing** (§3). **Done in
+   `e6091256a`.** All in PR #23.
+2. **Port the PostgreSQL comment fix** with its test (§4). **Done, PR #25.**
 3. **Fix the captcha clean-up** (§6): a stray image in the folder takes the page
-   down on PHP 8.
-4. **WebP transparency, `NULL` cookie, logger cast** (§5, §7, §8): one-liners.
+   down on PHP 8. **Done, PR #25.**
+4. **WebP transparency, `NULL` cookie, logger cast** (§5, §7, §8). **Done, PR #25.**
 5. **Optional:** `NULL` label (§9), cache path (§10), Vivaldi and Actions (§11),
    encryption edge (§12), the escape-character regression test (§13).
+   **Decided (2026-11-13): not now.** The Actions version bump (§11) would also
+   touch the workflow file changed by PR #24.
 6. **No action** on the items in §14: they repair `develop` code this
    repository does not carry.
 

@@ -203,7 +203,7 @@ on them):
 
 | Dependant | Result |
 |-----------|--------|
-| NCompPOSv2 | Not affected. All rules are on plain fields, the two `matches` rules are on plain fields, `set_value()` is never called (forms repopulate through the application's own `form_value()`), and its `custom[ID]` fields are validated outside `CI_Form_validation`. |
+| A private application using this repository | Not affected. All rules and `matches` rules are on plain fields, `set_value()` is never called, and its array-notation fields are validated outside `CI_Form_validation`. |
 | [ixaya/manager](https://packagist.org/packages/ixaya/manager) 2.4.0 (`6c342e0`) | Not affected. The package makes no `set_rules()`, `set_value()` or `matches` calls and does not extend `CI_Form_validation`. Its two sample applications under `extras/` validate only plain `email` and `password` fields. |
 
 Applications built on ixaya/manager could not be scanned. ixaya/manager

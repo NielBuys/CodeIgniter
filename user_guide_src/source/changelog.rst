@@ -27,6 +27,7 @@ Bug fixes for 3.1.25
 -  Fixed a bug where the :doc:`Image Manipulation Library <libraries/image_lib>` GD driver lost the transparency of WebP images when resizing, cropping or watermarking; it was kept for PNG only (pocketarc #71).
 -  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` function ``create_captcha()`` threw a ``TypeError`` on PHP 8 when the image folder held a ``.jpg`` or ``.png`` file whose name is not a timestamp. Expired-image clean-up now only touches captcha images, including those named with a comma decimal separator (pocketarc #74).
 -  Fixed a bug where :doc:`Logging <general/errors>` passed a float timestamp to ``date()`` when ``log_date_format`` contains microseconds (``u``), a deprecation on PHP 8.1+ (pocketarc #72).
+-  Fixed a bug where :doc:`Input Library <libraries/input>` method ``set_cookie()`` passed a ``NULL`` value to ``setcookie()``, a deprecation on PHP 8.1+. ``NULL`` is now sent as an empty string, as before (pocketarc #62).
 
 Version 3.1.24
 ==============

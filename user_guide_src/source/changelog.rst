@@ -23,6 +23,8 @@ Bug fixes for 3.1.25
 
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
+-  Fixed a bug where the :doc:`Session Library <libraries/sessions>` 'redis' driver lost its ``sess_save_path`` when ``sess_match_ip`` was enabled, so no session could start. Introduced in 3.1.14.
+
 Version 3.1.24
 ==============
 

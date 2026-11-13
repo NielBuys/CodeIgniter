@@ -71,6 +71,27 @@ class Session_redis_driver_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
+	public function test_tls_save_path_defaults()
+	{
+		$config = $this->_config($this->_driver('tls://redis.example?database=2&prefix=app:', FALSE));
+
+		$this->assertSame('tls://redis.example', $config['save_path']['host']);
+		$this->assertSame(6379, $config['save_path']['port']);
+		$this->assertSame(0.0, $config['save_path']['timeout']);
+		$this->assertSame(2, $config['save_path']['database']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_invalid_save_path_is_cleared()
+	{
+		$config = $this->_config($this->_driver(':6379', FALSE));
+
+		$this->assertNull($config['save_path']);
+	}
+
+	// --------------------------------------------------------------------
+
 	public function test_tcp_scheme_is_dropped()
 	{
 		$config = $this->_config($this->_driver('TCP://127.0.0.1:6380', FALSE));

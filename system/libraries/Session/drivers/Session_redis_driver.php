@@ -154,6 +154,8 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 		else
 		{
 			log_message('error', 'Session: Invalid Redis save path format: '.$this->_config['save_path']);
+			// open() treats an empty save path as a failure; a string here would break it on PHP 8
+			$this->_config['save_path'] = NULL;
 		}
 
 		if ($this->_config['match_ip'] === TRUE)

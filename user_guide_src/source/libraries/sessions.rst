@@ -672,6 +672,11 @@ sufficient::
 	$config['sess_driver'] = 'redis';
 	$config['sess_save_path'] = 'tcp://localhost:6379';
 
+For a Redis server that requires TLS, use the ``tls://`` (or ``ssl://``)
+scheme. This needs phpredis 5.0 or later::
+
+	$config['sess_save_path'] = 'tls://redis.example.com:6380?auth=secret';
+
 Memcached Driver
 ----------------
 

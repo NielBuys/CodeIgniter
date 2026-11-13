@@ -216,6 +216,33 @@ class Input_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
+	/**
+	 * Headers cannot be inspected here, but the call must not raise a
+	 * deprecation: setcookie() rejects NULL as the value on PHP 8.1+.
+	 */
+	public function test_set_cookie_null_value()
+	{
+		$deprecations = array();
+		set_error_handler(function ($errno, $errstr) use (&$deprecations) {
+			// "headers already sent" is expected under the test runner; only deprecations matter
+			$errno === E_DEPRECATED && $deprecations[] = $errstr;
+			return TRUE;
+		});
+
+		try
+		{
+			$this->input->set_cookie('ci_null_cookie', NULL);
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		$this->assertSame(array(), $deprecations);
+	}
+
+	// --------------------------------------------------------------------
+
 	public function test_get_request_header()
 	{
 		$this->markTestSkipped('TODO: Find a way to test HTTP headers');

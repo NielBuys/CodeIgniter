@@ -15,7 +15,7 @@ return array(
 
 	// Database configuration with failover
 	'pdo/sqlite_failover' => array(
-		'dsn' => 'sqlite:not_exists.sqlite',
+		'dsn' => 'sqlite:'.realpath(__DIR__.'/../..').'/not_exists/ci_test.sqlite', // the folder does not exist, so this cannot open
 		'hostname' => 'localhost',
 		'username' => 'sqlite',
 		'password' => 'sqlite',

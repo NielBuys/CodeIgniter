@@ -134,20 +134,22 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 		{
 			log_message('error', 'Session: No Redis save path configured.');
 		}
-		elseif (preg_match('#(?:tcp://)?([^:?]+)(?:\:(\d+))?(\?.+)?#', $this->_config['save_path'], $matches))
+		elseif (preg_match('#^(?:(tcp|tls|ssl)://)?([^:?]+)(?:\:(\d+))?(\?.+)?#i', $this->_config['save_path'], $matches))
 		{
-			isset($matches[3]) OR $matches[3] = ''; // Just to avoid undefined index notices below
+			isset($matches[4]) OR $matches[4] = ''; // Just to avoid undefined index notices below
+			$scheme = strtolower($matches[1]);
 			$this->_config['save_path'] = array(
-				'host' => $matches[1],
+				// phpredis needs the tls:// or ssl:// scheme in the host to enable encryption; tcp:// is the default
+				'host' => (in_array($scheme, array('tls', 'ssl'), TRUE) ? $scheme.'://' : '').$matches[2],
 				// Redis::connect() takes an int port and a float timeout; NULL for either is deprecated on PHP 8.1+.
 				// A unix socket path needs a port below 1, which is what NULL used to become.
-				'port' => empty($matches[2]) ? ($matches[1][0] === '/' ? 0 : 6379) : (int) $matches[2],
-				'password' => preg_match('#auth=([^\s&]+)#', $matches[3], $match) ? $match[1] : NULL,
-				'database' => preg_match('#database=(\d+)#', $matches[3], $match) ? (int) $match[1] : NULL,
-				'timeout' => preg_match('#timeout=(\d+\.\d+)#', $matches[3], $match) ? (float) $match[1] : 0.0
+				'port' => empty($matches[3]) ? ($matches[2][0] === '/' ? 0 : 6379) : (int) $matches[3],
+				'password' => preg_match('#auth=([^\s&]+)#', $matches[4], $match) ? $match[1] : NULL,
+				'database' => preg_match('#database=(\d+)#', $matches[4], $match) ? (int) $match[1] : NULL,
+				'timeout' => preg_match('#timeout=(\d+\.\d+)#', $matches[4], $match) ? (float) $match[1] : 0.0
 			);
 
-			preg_match('#prefix=([^\s&]+)#', $matches[3], $match) && $this->_key_prefix = $match[1];
+			preg_match('#prefix=([^\s&]+)#', $matches[4], $match) && $this->_key_prefix = $match[1];
 		}
 		else
 		{

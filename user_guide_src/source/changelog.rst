@@ -15,6 +15,7 @@ Release Date: Not Released
 -  General Changes
 
    -  Added an ``is_nullable`` property to :doc:`Database Metadata <database/metadata>` method ``field_data()`` (#6335). It is set by every driver; those that cannot report nullability return 1.
+   -  Added ``tls://`` and ``ssl://`` save paths to the :doc:`Session Library <libraries/sessions>` 'redis' driver, for Redis servers that require TLS (pocketarc #66). The scheme is no longer case-sensitive.
 
 Bug fixes for 3.1.25
 ====================

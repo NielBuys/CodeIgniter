@@ -57,6 +57,30 @@ class Session_redis_driver_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
+	public function test_tls_save_path()
+	{
+		foreach (array('tls', 'ssl', 'TLS') as $scheme)
+		{
+			$config = $this->_config($this->_driver($scheme.'://redis.example:6380?auth=secret', FALSE));
+
+			$this->assertSame(strtolower($scheme).'://redis.example', $config['save_path']['host'], $scheme);
+			$this->assertSame(6380, $config['save_path']['port'], $scheme);
+			$this->assertSame('secret', $config['save_path']['password'], $scheme);
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tcp_scheme_is_dropped()
+	{
+		$config = $this->_config($this->_driver('TCP://127.0.0.1:6380', FALSE));
+
+		$this->assertSame('127.0.0.1', $config['save_path']['host']);
+		$this->assertSame(6380, $config['save_path']['port']);
+	}
+
+	// --------------------------------------------------------------------
+
 	public function test_match_ip_keeps_save_path()
 	{
 		$driver = $this->_driver('tcp://127.0.0.1:6380?auth=secret&database=2', TRUE);

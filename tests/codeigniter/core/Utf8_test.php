@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class Utf8_test extends CI_TestCase {
 
 	public function set_up()
@@ -14,7 +16,6 @@ class Utf8_test extends CI_TestCase {
 	/**
 	 * __construct() test
 	 *
-	 * @covers	CI_Utf8::__construct
 	 */
 	public function test___construct()
 	{
@@ -47,8 +48,8 @@ class Utf8_test extends CI_TestCase {
 	 * clean_string() test
 	 *
 	 * @depends	test_is_ascii
-	 * @covers	CI_Utf8::clean_string
 	 */
+	#[Depends('test_is_ascii')]
 	public function test_clean_string()
 	{
 		$this->assertEquals('foo bar', $this->utf8->clean_string('foo bar'));
@@ -74,7 +75,6 @@ class Utf8_test extends CI_TestCase {
 	/**
 	 * convert_to_utf8() test
 	 *
-	 * @covers	CI_Utf8::convert_to_utf8
 	 */
 	public function test_convert_to_utf8()
 	{

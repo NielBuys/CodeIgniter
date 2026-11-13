@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class standard_test extends CI_TestCase {
 
 	public function test_bootstrap()
@@ -26,6 +28,7 @@ class standard_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_array_column()
 	{
 		// Basic tests
@@ -338,6 +341,7 @@ class standard_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_hex2bin()
 	{
 		if (is_php('5.4'))

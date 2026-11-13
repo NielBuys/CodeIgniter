@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class mbstring_test extends CI_TestCase {
 
 	public function test_bootstrap()
@@ -18,6 +20,7 @@ class mbstring_test extends CI_TestCase {
 	/**
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_mb_strlen()
 	{
 		$this->assertEquals(ICONV_ENABLED ? 4 : 8, mb_strlen('тест'));
@@ -29,6 +32,7 @@ class mbstring_test extends CI_TestCase {
 	/**
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_mb_strpos()
 	{
 		$this->assertEquals(ICONV_ENABLED ? 2 : 4, mb_strpos('тест', 'с'));
@@ -41,6 +45,7 @@ class mbstring_test extends CI_TestCase {
 	/**
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_mb_substr()
 	{
 		$this->assertEquals(ICONV_ENABLED ? 'стинг' : 'естинг', mb_substr('тестинг', 2));

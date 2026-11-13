@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class password_test extends CI_TestCase {
 
 	public function test_bootstrap()
@@ -39,6 +41,7 @@ class password_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_password_get_info()
 	{
 		$expected = array(
@@ -77,6 +80,7 @@ class password_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_password_hash()
 	{
 		// FALSE is returned if no CSPRNG source is available
@@ -112,6 +116,7 @@ class password_test extends CI_TestCase {
 	 *
 	 * @depends	test_password_get_info
 	 */
+	#[Depends('test_password_get_info')]
 	public function test_password_needs_rehash()
 	{
 		// invalid hash: always rehash
@@ -148,6 +153,7 @@ class password_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_password_verify()
 	{
 		$this->assertFalse(password_verify(123, 123));

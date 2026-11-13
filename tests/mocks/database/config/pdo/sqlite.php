@@ -4,7 +4,7 @@ return array(
 
 	// Typical Database configuration
 	'pdo/sqlite' => array(
-		'dsn' => 'sqlite:/'.realpath(__DIR__.'/../..').'/ci_test.sqlite',
+		'dsn' => 'sqlite:'.realpath(__DIR__.'/../..').'/ci_test.sqlite',
 		'hostname' => 'localhost',
 		'username' => 'sqlite',
 		'password' => 'sqlite',
@@ -24,7 +24,7 @@ return array(
 		'subdriver' => 'sqlite',
 		'failover' => array(
 			array(
-				'dsn' => 'sqlite:/'.realpath(__DIR__.'/../..').'/ci_test.sqlite',
+				'dsn' => 'sqlite:'.realpath(__DIR__.'/../..').'/ci_test.sqlite',
 				'hostname' => 'localhost',
 				'username' => 'sqlite',
 				'password' => 'sqlite',

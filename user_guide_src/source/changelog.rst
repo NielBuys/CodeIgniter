@@ -23,6 +23,8 @@ Bug fixes for 3.1.25
 
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
+-  Fixed a bug where :doc:`Database Forge <database/forge>` method ``modify_column()`` for PostgreSQL ('postgre' and 'pdo/pgsql') set a column comment on the old column name after renaming it, so the statement failed (pocketarc #68).
+
 Version 3.1.24
 ==============
 

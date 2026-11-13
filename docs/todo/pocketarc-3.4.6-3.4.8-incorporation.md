@@ -5,8 +5,9 @@ https://github.com/pocketarc/codeigniter/releases/tag/3.4.7 (2026-11-02),
 https://github.com/pocketarc/codeigniter/releases/tag/3.4.8 (2026-11-08)
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-11-13
-**Status:** Section 2 applied 2026-11-13 in `f69a69e55` (branch
-`tasks/redis-session-match-ip`), with constructor tests. The rest is not actioned.
+**Status:** Section 2 applied 2026-11-13 in `f69a69e55` (`sess_match_ip`) and
+`929f65182` (#6164 defaults), on branch `tasks/redis-session-match-ip`, with
+constructor tests. The rest is not actioned.
 **Verdict:** Six changes apply here, all small: Redis session TLS, the PostgreSQL
 column comment after a rename, WebP transparency, the captcha clean-up crash on
 PHP 8, a `NULL` cookie value and a float passed to `date()` in the logger. Scoping
@@ -137,7 +138,7 @@ file is now identical to its state before `c0aa214b9`. The removed
 [Session_redis_driver_test.php](tests/codeigniter/libraries/Session_redis_driver_test.php)
 fail on the old code and pass on the fix.
 
-### Related, not yet fixed: the #6164 timeout default was never applied
+### Related: the #6164 timeout default was never applied
 
 Found during review of the fix above. Also **local to this repository**.
 
@@ -167,10 +168,12 @@ driver's new `database` option
 ([Cache_redis.php:64](system/libraries/Cache/drivers/Cache_redis.php#L64)) is
 never read, because there is no `select()` call.
 
-**Fix.** Default `timeout` to `0.0`, and `port` to phpredis's default `6379`.
-Then either correct the 3.1.14 entry or record the real fix under 3.1.25.
-Implement the cache `database` option, or drop the claim. Best done with
-section 3, which rewrites the same lines.
+**Decided: fixed** in `929f65182`, on the same branch as the `sess_match_ip` fix.
+`timeout` now defaults to `0.0`, and `port` to `6379`, or `0` for a save path that
+starts with `/` (a unix socket, as before). The 3.1.14 changelog entry now says
+what actually changed, and the 3.1.25 entry records the session fix. The cache
+`database` default is left unused. Implementing it would be a new feature, not
+part of #6164.
 
 ---
 
@@ -467,9 +470,9 @@ parsed, but only for configurations that do not work today.
 
 ## 18. Recommended order of work
 
-1. **Fix the `sess_match_ip` defect** (§2). **Done in `f69a69e55`.** Then the
-   #6164 timeout default (end of §2) and **TLS parsing** (§3), in one
-   change. The defect is local and breaks every Redis session with IP matching.
+1. **Fix the `sess_match_ip` defect and the #6164 defaults** (§2). **Done in
+   `f69a69e55` and `929f65182`.** Then **TLS parsing** (§3), which rewrites the
+   same parser lines.
 2. **Port the PostgreSQL comment fix** with its test (§4).
 3. **Fix the captcha clean-up** (§6): a stray image in the folder takes the page
    down on PHP 8.

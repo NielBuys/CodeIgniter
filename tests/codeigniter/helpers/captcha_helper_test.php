@@ -77,4 +77,46 @@ class Captcha_helper_test extends CI_TestCase {
 		$this->assertFileExists($this->dir.$files['not_image']);
 	}
 
+	// --------------------------------------------------------------------
+
+	/**
+	 * Text placement must not pass a float to mt_rand(), which PHP 8.1+
+	 * deprecates. A random 8-character word, an odd height and both text paths
+	 * (built-in font and TrueType) produce fractional bounds.
+	 */
+	public function test_create_captcha_text_placement_raises_no_deprecation()
+	{
+		$fonts = array('');
+		function_exists('imagettftext') && $fonts[] = realpath(SYSTEM_PATH.'fonts/texb.ttf');
+
+		$deprecations = array();
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'captcha_helper.php' && $deprecations[] = $errstr;
+			return TRUE;
+		}, E_DEPRECATED);
+
+		try
+		{
+			foreach ($fonts as $font)
+			{
+				$cap = create_captcha(array(
+					'img_path' => $this->dir,
+					'img_url' => 'http://example.com/captcha/',
+					'img_height' => 31,
+					'font_path' => $font,
+					'word_length' => 8
+				));
+
+				$this->assertIsArray($cap);
+				$this->assertSame(8, strlen($cap['word']));
+			}
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		$this->assertSame(array(), array_unique($deprecations));
+	}
+
 }

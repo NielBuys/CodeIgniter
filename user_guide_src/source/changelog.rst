@@ -31,6 +31,7 @@ Bug fixes for 3.1.25
 
 -  Fixed a bug where :doc:`Logging <general/errors>` passed a float timestamp to ``date()`` when ``log_date_format`` contains microseconds (``u``), a deprecation on PHP 8.1+ (pocketarc #72).
 -  Fixed a bug where :doc:`Input Library <libraries/input>` method ``set_cookie()`` passed a ``NULL`` value to ``setcookie()``, a deprecation on PHP 8.1+. ``NULL`` is now sent as an empty string, as before (pocketarc #62).
+-  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` function ``create_captcha()`` passed fractional bounds to ``mt_rand()`` when placing the text, a deprecation on PHP 8.1+ for most word lengths and odd image heights.
 
 Version 3.1.24
 ==============

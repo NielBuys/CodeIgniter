@@ -24,6 +24,7 @@ Bug fixes for 3.1.25
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
 -  Fixed a bug where :doc:`Database Forge <database/forge>` method ``modify_column()`` for PostgreSQL ('postgre' and 'pdo/pgsql') set a column comment on the old column name after renaming it, so the statement failed (pocketarc #68).
+-  Fixed a bug where the :doc:`Image Manipulation Library <libraries/image_lib>` GD driver lost the transparency of WebP images when resizing, cropping or watermarking; it was kept for PNG only (pocketarc #71).
 
 Version 3.1.24
 ==============

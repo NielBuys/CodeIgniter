@@ -18,24 +18,6 @@ Release Information
 
 https://github.com/NielBuys/CodeIgniter/releases
 
-**********************
-Continuous Integration
-**********************
-
-GitHub has disabled GitHub Actions for this repository (since October 2026),
-so the PHPUnit workflow in ``.github/workflows/test-phpunit.yml`` does not run
-on pushes or pull requests.
-
-Every pull request must pass the tests before it is created. Run each database
-configuration the workflow runs (``mysqli``, ``pdo/mysql``, ``pgsql``,
-``pdo/pgsql``, ``sqlite`` and ``pdo/sqlite`` in ``tests/travis``) on the oldest
-and the newest supported PHP version, and state the results in the pull
-request::
-
-	vendor/bin/phpunit --configuration tests/travis/mysqli.phpunit.xml --fail-on-warning --fail-on-notice
-
-PHP 7.4 and 8.0 use PHPUnit 9 and the matching ``*.phpunit_v9.xml`` files.
-
 *******************
 Server Requirements
 *******************

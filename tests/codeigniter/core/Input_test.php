@@ -223,9 +223,9 @@ class Input_test extends CI_TestCase {
 	public function test_set_cookie_null_value()
 	{
 		$deprecations = array();
-		set_error_handler(function ($errno, $errstr) use (&$deprecations) {
-			// "headers already sent" is expected under the test runner; only deprecations matter
-			$errno === E_DEPRECATED && $deprecations[] = $errstr;
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			// "headers already sent" is expected under the test runner; only deprecations from CI_Input matter
+			$errno === E_DEPRECATED && basename($errfile) === 'Input.php' && $deprecations[] = $errstr;
 			return TRUE;
 		});
 

@@ -115,9 +115,10 @@ class Log_test extends CI_TestCase {
 		$this->ci_set_config('log_file_permissions', 0644);
 		$instance = new CI_Log();
 
+		// Only deprecations raised by CI_Log count; vfsStream raises its own on PHP 8.6
 		$deprecations = array();
-		set_error_handler(function ($errno, $errstr) use (&$deprecations) {
-			$deprecations[] = $errstr;
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'Log.php' && $deprecations[] = $errstr;
 			return TRUE;
 		}, E_DEPRECATED);
 

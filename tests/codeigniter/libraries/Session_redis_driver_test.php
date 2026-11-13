@@ -36,6 +36,27 @@ class Session_redis_driver_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
+	public function test_save_path_defaults()
+	{
+		$config = $this->_config($this->_driver('tcp://127.0.0.1', FALSE));
+
+		$this->assertSame(6379, $config['save_path']['port']);
+		$this->assertSame(0.0, $config['save_path']['timeout']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_unix_socket_save_path_defaults()
+	{
+		$config = $this->_config($this->_driver('/var/run/redis/redis.sock', FALSE));
+
+		$this->assertSame('/var/run/redis/redis.sock', $config['save_path']['host']);
+		$this->assertSame(0, $config['save_path']['port']);
+		$this->assertSame(0.0, $config['save_path']['timeout']);
+	}
+
+	// --------------------------------------------------------------------
+
 	public function test_match_ip_keeps_save_path()
 	{
 		$driver = $this->_driver('tcp://127.0.0.1:6380?auth=secret&database=2', TRUE);

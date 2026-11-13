@@ -24,6 +24,7 @@ Bug fixes for 3.1.25
    .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
 
 -  Fixed a bug where the :doc:`Session Library <libraries/sessions>` 'redis' driver lost its ``sess_save_path`` when ``sess_match_ip`` was enabled, so no session could start. Introduced in 3.1.14.
+-  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver passed ``NULL`` as the port and timeout to ``Redis::connect()`` when ``sess_save_path`` did not set them, which is deprecated on PHP 8.1+. They now default to ``6379`` (``0`` for a unix socket path) and ``0.0``.
 
 Version 3.1.24
 ==============
@@ -177,7 +178,7 @@ Bug fixes for 3.1.14
 
 -  Fixed a bug (#6134) - :doc:`Security Class <libraries/security>` URL-encoded the slashes in the CSRF cookie path.
 -  Fixed a bug (#6159) - :doc:`Input Library <libraries/input>` method ``set_cookie()`` ignored ``samesite`` when the cookie parameters were passed as an array.
--  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver did not parse the ``auth``, ``database``, ``timeout`` and ``prefix`` options from the save path; :doc:`Caching Library <libraries/caching>` 'redis' driver gained a ``database`` option.
+-  Fixed a bug (#6164) - :doc:`Caching Library <libraries/caching>` 'redis' driver default ``timeout`` changed from ``0`` to ``0.0``. The :doc:`Session Library <libraries/sessions>` part of this fix, a ``NULL`` timeout passed to ``Redis::connect()``, did not take effect until 3.1.25.
 -  Fixed a bug (#6175) - ``CI_Router`` treated an empty ``$directory`` as an override.
 -  Fixed a bug (#6201) - :doc:`Pagination Library <libraries/pagination>` passed a non-string to ``ctype_digit()``.
 -  Fixed a bug (#6149) - :doc:`Query Builder <database/query_builder>` and :doc:`XML-RPC Library <libraries/xmlrpc>` used string interpolation syntax deprecated in PHP 8.2.

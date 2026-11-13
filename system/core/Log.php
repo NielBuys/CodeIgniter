@@ -208,7 +208,7 @@ class CI_Log {
 		{
 			$microtime_full = microtime(TRUE);
 			$microtime_short = sprintf("%06d", ($microtime_full - floor($microtime_full)) * 1000000);
-			$date = new DateTime(date('Y-m-d H:i:s.'.$microtime_short, $microtime_full));
+			$date = new DateTime(date('Y-m-d H:i:s.'.$microtime_short, (int) $microtime_full));
 			$date = $date->format($this->_date_fmt);
 		}
 		else

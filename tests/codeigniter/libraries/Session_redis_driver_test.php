@@ -25,7 +25,7 @@ class Session_redis_driver_test extends CI_TestCase {
 		$this->assertSame(
 			array(
 				'host' => '127.0.0.1',
-				'port' => '6380',
+				'port' => 6380,
 				'password' => 'secret',
 				'database' => 2,
 				'timeout' => 1.5
@@ -64,7 +64,7 @@ class Session_redis_driver_test extends CI_TestCase {
 
 		$this->assertIsArray($config['save_path']);
 		$this->assertSame('127.0.0.1', $config['save_path']['host']);
-		$this->assertSame('6380', $config['save_path']['port']);
+		$this->assertSame(6380, $config['save_path']['port']);
 		$this->assertSame('secret', $config['save_path']['password']);
 		$this->assertSame(2, $config['save_path']['database']);
 	}

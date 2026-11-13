@@ -260,8 +260,9 @@ class Encryption_test extends CI_TestCase {
 		);
 
 		$deprecations = array();
-		set_error_handler(function ($errno, $errstr) use (&$deprecations) {
-			$deprecations[] = $errstr;
+		// Only deprecations raised by the code under test count
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'Encryption.php' && $deprecations[] = $errstr;
 			return TRUE;
 		}, E_DEPRECATED);
 

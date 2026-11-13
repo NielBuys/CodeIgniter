@@ -15,7 +15,6 @@ class Utf8_test extends CI_TestCase {
 
 	/**
 	 * __construct() test
-	 *
 	 */
 	public function test___construct()
 	{
@@ -74,7 +73,6 @@ class Utf8_test extends CI_TestCase {
 
 	/**
 	 * convert_to_utf8() test
-	 *
 	 */
 	public function test_convert_to_utf8()
 	{

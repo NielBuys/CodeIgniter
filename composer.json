@@ -18,10 +18,10 @@
 			"phpunit --color=always --coverage-text --configuration tests/phpunit.xml"
 		],
 		"post-install-cmd": [
-			"@php tests/patch-vendor.php"
+			"@php -r \"is_file('tests/patch-vendor.php') && require 'tests/patch-vendor.php';\""
 		],
 		"post-update-cmd": [
-			"@php tests/patch-vendor.php"
+			"@php -r \"is_file('tests/patch-vendor.php') && require 'tests/patch-vendor.php';\""
 		]
 	},
 	"require-dev": {

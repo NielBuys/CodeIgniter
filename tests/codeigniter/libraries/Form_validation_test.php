@@ -359,8 +359,9 @@ class Form_validation_test extends CI_TestCase {
 	public function test_set_rules_null_label()
 	{
 		$deprecations = array();
-		set_error_handler(function ($errno, $errstr) use (&$deprecations) {
-			$deprecations[] = $errstr;
+		// Only deprecations raised by the code under test count
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'Form_validation.php' && $deprecations[] = $errstr;
 			return TRUE;
 		}, E_DEPRECATED);
 

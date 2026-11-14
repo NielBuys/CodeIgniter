@@ -18,10 +18,10 @@
 			"phpunit --color=always --coverage-text --configuration tests/phpunit.xml"
 		],
 		"post-install-cmd": [
-			"sed -i s/name{0}/name[0]/ vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php"
+			"@php -r \"is_file('tests/patch-vendor.php') && require 'tests/patch-vendor.php';\""
 		],
 		"post-update-cmd": [
-			"sed -i s/name{0}/name[0]/ vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php"
+			"@php -r \"is_file('tests/patch-vendor.php') && require 'tests/patch-vendor.php';\""
 		]
 	},
 	"require-dev": {

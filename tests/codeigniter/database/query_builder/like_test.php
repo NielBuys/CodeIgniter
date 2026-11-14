@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class Like_test extends CI_TestCase {
 
 	/**
@@ -110,6 +112,7 @@ class Like_test extends CI_TestCase {
 	 *
 	 * @dataProvider like_set_side_provider
 	 */
+	#[DataProvider('like_set_side_provider')]
 	public function test_like_set_side($str, $side, $expected_name)
 	{
 		$actual = $this->db->like('name', $str, $side)->get('job')->result_array();

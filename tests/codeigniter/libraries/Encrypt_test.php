@@ -1,7 +1,11 @@
 <?php
+
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+
 /**
  * @requires extension mcrypt
  */
+#[RequiresPhpExtension('mcrypt')]
 class Encrypt_test extends CI_TestCase {
 
 	public function set_up()

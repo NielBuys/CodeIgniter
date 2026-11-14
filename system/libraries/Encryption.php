@@ -371,6 +371,9 @@ class CI_Encryption {
 	 */
 	public function encrypt($data, ?array $params = NULL)
 	{
+		// NULL is treated as an empty string, as the OpenSSL driver already does
+		$data === NULL && $data = '';
+
 		if (($params = $this->_get_params($params)) === FALSE)
 		{
 			return FALSE;
@@ -508,6 +511,9 @@ class CI_Encryption {
 	 */
 	public function decrypt($data, ?array $params = NULL)
 	{
+		// NULL is treated as an empty string; PHP 8.1+ deprecates passing it to base64_decode()
+		$data === NULL && $data = '';
+
 		if (($params = $this->_get_params($params)) === FALSE)
 		{
 			return FALSE;

@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class hash_test extends CI_TestCase {
 
 	public function test_bootstrap()
@@ -22,6 +24,7 @@ class hash_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_hash_equals()
 	{
 		$this->assertTrue(hash_equals('same', 'same'));
@@ -42,6 +45,7 @@ class hash_test extends CI_TestCase {
 	 *
 	 * @depends	test_bootstrap
 	 */
+	#[Depends('test_bootstrap')]
 	public function test_hash_pbkdf2()
 	{
 		if (is_php('5.5'))

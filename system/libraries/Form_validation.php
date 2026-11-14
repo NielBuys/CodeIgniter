@@ -272,8 +272,8 @@ class CI_Form_validation {
 			$rules = preg_split('/\|(?![^\[]*\])/', $rules);
 		}
 
-		// If the field label wasn't passed we use the field name
-		$label = ($label === '') ? $field : $label;
+		// If the field label wasn't passed (or is NULL) we use the field name
+		$label = ($label === NULL OR $label === '') ? $field : $label;
 
 		$indexes = array();
 

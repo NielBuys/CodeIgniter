@@ -8,7 +8,7 @@ class Calendar_test extends CI_TestCase {
 		$this->ci_instance_var('load', $this->getMockBuilder('CI_Loader')->onlyMethods(array('helper'))->getMock());
 
 		$lang = $this->getMockBuilder('CI_Lang')->onlyMethods(array('load', 'line'))->getMock();
-		$lang->expects($this->any())->method('line')->will($this->returnValue(FALSE));
+		$lang->expects($this->any())->method('line')->willReturn(FALSE);
 		$this->ci_instance_var('lang', $lang);
 
 		$this->calendar = new CI_Calendar();

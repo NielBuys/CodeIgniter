@@ -98,4 +98,42 @@ class Log_test extends CI_TestCase {
 			"LEVEL - Timestamp --> Message".PHP_EOL
 		);
 	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * A date format with microseconds ('u') must not pass a float timestamp
+	 * to date(), which is deprecated from PHP 8.1.
+	 */
+	public function test_write_log_with_microseconds()
+	{
+		vfsStream::newDirectory('micro_logs', 0755)->at($this->_test_dir);
+		$this->ci_set_config('log_path', vfsStream::url('root/micro_logs').'/');
+		$this->ci_set_config('log_threshold', 1);
+		$this->ci_set_config('log_date_format', 'Y-m-d H:i:s.u');
+		$this->ci_set_config('log_file_extension', '');
+		$this->ci_set_config('log_file_permissions', 0644);
+		$instance = new CI_Log();
+
+		// Only deprecations raised by CI_Log count; vfsStream raises its own on PHP 8.6
+		$deprecations = array();
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'Log.php' && $deprecations[] = $errstr;
+			return TRUE;
+		}, E_DEPRECATED);
+
+		try
+		{
+			$this->assertTrue($instance->write_log('error', 'Micro message'));
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		$this->assertSame(array(), $deprecations);
+
+		$content = file_get_contents(vfsStream::url('root/micro_logs/log-'.date('Y-m-d').'.php'));
+		$this->assertMatchesRegularExpression('/ERROR - \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6} --> Micro message/', $content);
+	}
 }

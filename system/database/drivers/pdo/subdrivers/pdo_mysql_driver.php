@@ -366,6 +366,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 
 			$retval[$i]->default		= $query[$i]->Default;
 			$retval[$i]->primary_key	= (int) ($query[$i]->Key === 'PRI');
+			$retval[$i]->is_nullable	= (int) ($query[$i]->Null === 'YES');
 		}
 
 		return $retval;

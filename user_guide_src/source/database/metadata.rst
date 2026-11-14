@@ -127,4 +127,18 @@ database:
 -  name - column name
 -  max_length - maximum length of the column
 -  primary_key - 1 if the column is a primary key
+-  is_nullable - 1 if the column accepts NULL, 0 if it is NOT NULL
 -  type - the type of the column
+
+.. note:: ``is_nullable`` is always present, but not every driver can report
+	it. Drivers that cannot always return 1.
+
+	Table metadata (``$this->db->field_data('table_name')``) reports the
+	real value on MySQL (mysqli, pdo/mysql), PostgreSQL (postgre,
+	pdo/pgsql), SQLite (sqlite3, pdo/sqlite), Oracle (oci8, pdo/oci) and
+	CUBRID. SQL Server, Firebird, DB2 and Informix always return 1.
+
+	Result metadata (``$query->field_data()``) reports the real value only
+	on MySQL (mysqli, pdo/mysql), CUBRID and sqlsrv. It describes the
+	result set rather than the table, so a column from a ``LEFT JOIN`` or
+	an expression can be nullable even when the underlying column is not.

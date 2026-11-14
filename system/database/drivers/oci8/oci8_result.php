@@ -148,6 +148,7 @@ class CI_DB_oci8_result extends CI_DB_result {
 			$F->name	= oci_field_name($this->stmt_id, $c);
 			$F->type	= oci_field_type($this->stmt_id, $c);
 			$F->max_length	= oci_field_size($this->stmt_id, $c);
+			$F->is_nullable	= 1; // Not reported by this driver
 
 			$retval[] = $F;
 		}

@@ -275,6 +275,7 @@ class CI_DB_sqlite3_driver extends CI_DB {
 			$retval[$i]->max_length		= NULL;
 			$retval[$i]->default		= $query[$i]['dflt_value'];
 			$retval[$i]->primary_key	= isset($query[$i]['pk']) ? (int) $query[$i]['pk'] : 0;
+			$retval[$i]->is_nullable	= (int) ! $query[$i]['notnull'];
 		}
 
 		return $retval;

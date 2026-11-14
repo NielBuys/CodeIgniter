@@ -7,10 +7,48 @@ fork. Issue numbers without a prefix refer to the original
 `bcit-ci/CodeIgniter <https://github.com/bcit-ci/CodeIgniter>`_ repository; ``pocketarc #N`` refers to
 `pocketarc/codeigniter <https://github.com/pocketarc/codeigniter>`_.
 
+Version 3.1.25
+==============
+
+Release Date: Nov 14, 2026
+
+-  General Changes
+
+   -  Added an ``is_nullable`` property to :doc:`Database Metadata <database/metadata>` method ``field_data()`` (#6335). It is set by every driver; those that cannot report nullability return 1.
+   -  Added ``tls://`` and ``ssl://`` save paths to the :doc:`Session Library <libraries/sessions>` 'redis' driver, for Redis servers that require TLS (pocketarc #66). Requires phpredis 5.0 or later. The scheme is no longer case-sensitive.
+   -  Added SSL context options to the :doc:`Session Library <libraries/sessions>` 'redis' driver save path as ``stream[...]`` parameters, e.g. ``tls://host:6380?stream[cafile]=/path/to/ca.pem``, for servers with a self-signed or private-CA certificate. Requires phpredis 5.3 or later.
+
+Bug fixes for 3.1.25
+====================
+
+-  Fixed a bug (#6337) - :doc:`Form Validation Library <libraries/form_validation>` treated a blank array-notation field (e.g. ``address[city]``) as not submitted, so ``set_value()`` repopulated it with the default. Array-notation fields now behave like plain fields.
+
+   .. note:: This changes behaviour for blank array-notation fields only. Callbacks on them now receive ``''`` instead of ``NULL``, and ``matches`` between two blank array fields now passes. Review callbacks that use ``=== NULL`` or ``is_null()`` to detect a blank value, and add ``required`` where a blank pair must be rejected.
+
+-  Fixed a bug where the :doc:`Session Library <libraries/sessions>` 'redis' driver lost its ``sess_save_path`` when ``sess_match_ip`` was enabled, so no session could start. Introduced in 3.1.14.
+-  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver passed ``NULL`` as the port and timeout to ``Redis::connect()`` when ``sess_save_path`` did not set them, which is deprecated on PHP 8.1+. They now default to ``6379`` (``0`` for a unix socket path) and ``0.0``.
+-  Fixed a bug where :doc:`Database Forge <database/forge>` method ``modify_column()`` for PostgreSQL ('postgre' and 'pdo/pgsql') set a column comment on the old column name after renaming it, so the statement failed (pocketarc #68).
+-  Fixed a bug where the :doc:`Image Manipulation Library <libraries/image_lib>` GD driver lost the transparency of WebP images when resizing or cropping; it was kept for PNG only (pocketarc #71).
+
+   .. note:: Resized and cropped WebP images with transparent areas now keep them, as PNG images already did.
+
+-  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` function ``create_captcha()`` threw a ``TypeError`` on PHP 8 when the image folder held a ``.jpg`` or ``.png`` file whose name is not a timestamp. Expired-image clean-up now only touches captcha images, including those named with a comma decimal separator (pocketarc #74).
+
+   .. note:: On PHP 7, other ``.jpg`` and ``.png`` files in the captcha folder (e.g. ``logo.png``) used to be deleted by this clean-up. They are now kept on every PHP version.
+
+-  Fixed a bug where :doc:`Logging <general/errors>` passed a float timestamp to ``date()`` when ``log_date_format`` contains microseconds (``u``), a deprecation on PHP 8.1+ (pocketarc #72).
+-  Fixed a bug where :doc:`Input Library <libraries/input>` method ``set_cookie()`` passed a ``NULL`` value to ``setcookie()``, a deprecation on PHP 8.1+. ``NULL`` is now sent as an empty string, as before (pocketarc #62).
+-  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` function ``create_captcha()`` passed fractional bounds to ``mt_rand()`` when placing the text, a deprecation on PHP 8.1+ for most word lengths and odd image heights.
+-  Fixed a bug where :doc:`Form Validation Library <libraries/form_validation>` method ``set_rules()`` kept a ``NULL`` label instead of falling back to the field name, so error messages showed no name and PHP 8.1+ raised a deprecation (pocketarc #75).
+
+   .. note:: Error messages for a field whose rules were set with a ``NULL`` label now show the field name, as they already did for an empty label.
+
+-  Fixed a bug where :doc:`Encryption Library <libraries/encryption>` method ``decrypt()`` passed ``NULL`` to ``base64_decode()`` when HMAC was disabled, a deprecation on PHP 8.1+. ``encrypt()`` and ``decrypt()`` now treat ``NULL`` as an empty string (pocketarc #86).
+
 Version 3.1.24
 ==============
 
-Release Date: Oct 7, 2026
+Release Date: Oct 6, 2026
 
 -  General Changes
 
@@ -159,7 +197,7 @@ Bug fixes for 3.1.14
 
 -  Fixed a bug (#6134) - :doc:`Security Class <libraries/security>` URL-encoded the slashes in the CSRF cookie path.
 -  Fixed a bug (#6159) - :doc:`Input Library <libraries/input>` method ``set_cookie()`` ignored ``samesite`` when the cookie parameters were passed as an array.
--  Fixed a bug (#6164) - :doc:`Session Library <libraries/sessions>` 'redis' driver did not parse the ``auth``, ``database``, ``timeout`` and ``prefix`` options from the save path; :doc:`Caching Library <libraries/caching>` 'redis' driver gained a ``database`` option.
+-  Changed the :doc:`Caching Library <libraries/caching>` 'redis' driver default ``timeout`` from ``0`` to ``0.0`` (#6164). The :doc:`Session Library <libraries/sessions>` part of #6164, a ``NULL`` timeout passed to ``Redis::connect()``, did not take effect until 3.1.25.
 -  Fixed a bug (#6175) - ``CI_Router`` treated an empty ``$directory`` as an override.
 -  Fixed a bug (#6201) - :doc:`Pagination Library <libraries/pagination>` passed a non-string to ``ctype_digit()``.
 -  Fixed a bug (#6149) - :doc:`Query Builder <database/query_builder>` and :doc:`XML-RPC Library <libraries/xmlrpc>` used string interpolation syntax deprecated in PHP 8.2.

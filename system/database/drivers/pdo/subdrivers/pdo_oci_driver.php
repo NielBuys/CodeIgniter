@@ -251,6 +251,7 @@ class CI_DB_pdo_oci_driver extends CI_DB_pdo_driver {
 				$default = '';
 			}
 			$retval[$i]->default		= $query[$i]->COLUMN_DEFAULT;
+			$retval[$i]->is_nullable	= (int) ($query[$i]->NULLABLE === 'Y');
 		}
 
 		return $retval;

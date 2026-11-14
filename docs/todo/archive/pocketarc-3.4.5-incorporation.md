@@ -174,9 +174,8 @@ CLI, so the detection itself was not reproduced here.
 ### It does not reach existing applications
 
 `mimes.php` lives under `application/config/`, which each application owns.
-Apps load `system/` from this package, not `application/`. NCompPOSv2, for
-example, has its own copy without `text/plain`
-(`NCompPOSv2/application/config/mimes.php:117`). The change only affects new
+Apps load `system/` from this package, not `application/`, and keep their own
+copy of `mimes.php`. The change only affects new
 projects started from this template. An application that needs it must edit its
 own `mimes.php`.
 
@@ -230,7 +229,7 @@ process: `3.1.24-dev`, or bumping on every tag. Anything that compares
 `CI_VERSION` would see the jump from 13 to 23 or 24. A release-process decision,
 not part of this incorporation.
 
-**Decided (2026-10-07): bump on every tag.** Set to `3.1.24` in the 3.1.24
+**Decided (2026-10-06): bump on every tag.** Set to `3.1.24` in the 3.1.24
 release preparation, together with `user_guide_src/source/conf.py` and the
 current-version link in `installation/downloads.rst`.
 

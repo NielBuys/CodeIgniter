@@ -18,7 +18,7 @@ return array(
 		'hostname' => 'localhost',
 		'username' => 'sqlite',
 		'password' => 'sqlite',
-		'database' => '../not_exists.sqlite',
+		'database' => realpath(__DIR__.'/..').'/not_exists/ci_test.sqlite', // the folder does not exist, so this cannot open
 		'dbdriver' => 'sqlite3',
 		'failover' => array(
 			array(

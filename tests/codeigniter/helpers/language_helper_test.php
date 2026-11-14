@@ -6,7 +6,7 @@ class Language_helper_test extends CI_TestCase {
 	{
 		$this->helper('language');
 		$lang = $this->getMockBuilder('CI_Lang')->onlyMethods(array('line'))->getMock();
-		$lang->expects($this->any())->method('line')->will($this->returnValue(FALSE));
+		$lang->expects($this->any())->method('line')->willReturn(FALSE);
 		$this->ci_instance_var('lang', $lang);
 
 		$this->assertFalse(lang(1));

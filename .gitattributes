@@ -50,6 +50,7 @@ readme.rst
 # They don't want all of our tests...
 tests/codeigniter/ export-ignore
 tests/travis/ export-ignore
+tests/docker/ export-ignore
 
 # User Guide source files and compiled files
 user_guide_src export-ignore

@@ -136,6 +136,7 @@ class CI_DB_odbc_result extends CI_DB_result {
 			$retval[$i]->type		= odbc_field_type($this->result_id, $odbc_index);
 			$retval[$i]->max_length		= odbc_field_len($this->result_id, $odbc_index);
 			$retval[$i]->primary_key	= 0;
+			$retval[$i]->is_nullable	= 1; // Not reported by this driver
 			$retval[$i]->default		= '';
 		}
 

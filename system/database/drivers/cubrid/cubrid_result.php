@@ -107,6 +107,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 			$retval[$i]->type		= cubrid_field_type($this->result_id, $i);
 			$retval[$i]->max_length		= cubrid_field_len($this->result_id, $i);
 			$retval[$i]->primary_key	= (int) (strpos(cubrid_field_flags($this->result_id, $i), 'primary_key') !== FALSE);
+			$retval[$i]->is_nullable	= (int) (strpos(cubrid_field_flags($this->result_id, $i), 'not_null') === FALSE);
 		}
 
 		return $retval;

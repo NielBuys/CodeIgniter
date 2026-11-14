@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class Lang_test extends CI_TestCase {
 
 	protected $lang;
@@ -90,6 +92,7 @@ class Lang_test extends CI_TestCase {
 	/**
 	 * @depends	test_load
 	 */
+	#[Depends('test_load')]
 	public function test_line()
 	{
 		$this->ci_vfs_clone('system/language/english/profiler_lang.php');

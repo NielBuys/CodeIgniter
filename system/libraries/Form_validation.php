@@ -272,8 +272,8 @@ class CI_Form_validation {
 			$rules = preg_split('/\|(?![^\[]*\])/', $rules);
 		}
 
-		// If the field label wasn't passed we use the field name
-		$label = ($label === '') ? $field : $label;
+		// If the field label wasn't passed (or is NULL) we use the field name
+		$label = ($label === NULL OR $label === '') ? $field : $label;
 
 		$indexes = array();
 
@@ -623,8 +623,7 @@ class CI_Form_validation {
 			return isset($array[$keys[$i]]) ? $this->_reduce_array($array[$keys[$i]], $keys, ($i+1)) : NULL;
 		}
 
-		// NULL must be returned for empty fields
-		return ($array === '') ? NULL : $array;
+		return $array;
 	}
 
 	// --------------------------------------------------------------------

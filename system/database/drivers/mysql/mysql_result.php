@@ -128,6 +128,7 @@ class CI_DB_mysql_result extends CI_DB_result {
 			$retval[$i]->type		= mysql_field_type($this->result_id, $i);
 			$retval[$i]->max_length		= mysql_field_len($this->result_id, $i);
 			$retval[$i]->primary_key	= (int) (strpos(mysql_field_flags($this->result_id, $i), 'primary_key') !== FALSE);
+			$retval[$i]->is_nullable	= (int) (strpos(mysql_field_flags($this->result_id, $i), 'not_null') === FALSE);
 		}
 
 		return $retval;

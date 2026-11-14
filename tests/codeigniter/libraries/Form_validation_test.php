@@ -351,6 +351,36 @@ class Form_validation_test extends CI_TestCase {
 		$this->assertEquals('', $this->form_validation->error('req_field'));
 	}
 
+	/**
+	 * A NULL label falls back to the field name, like '' does. Before, it stayed
+	 * NULL, the message showed no name, and sscanf(NULL) raised a deprecation on
+	 * PHP 8.1+.
+	 */
+	public function test_set_rules_null_label()
+	{
+		$deprecations = array();
+		// Only deprecations raised by the code under test count
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'Form_validation.php' && $deprecations[] = $errstr;
+			return TRUE;
+		}, E_DEPRECATED);
+
+		try
+		{
+			$this->form_validation->set_message('required', 'The {field} field is required.');
+			$this->form_validation->set_rules('foo', NULL, 'required');
+			$this->form_validation->set_data(array('foo' => ''));
+			$this->form_validation->run();
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		$this->assertSame(array(), $deprecations);
+		$this->assertSame('<p>The foo field is required.</p>', $this->form_validation->error('foo'));
+	}
+
 	public function test_set_error_delimiters()
 	{
 		$prefix = '<div class="error">';
@@ -460,6 +490,55 @@ class Form_validation_test extends CI_TestCase {
 		$this->assertEquals('bar2', $this->form_validation->set_value('bar[]', $default));
 
 		$_POST = array();
+	}
+
+	public function test_set_value_blank_array_field()
+	{
+		// #6337: a blank array-notation field must repopulate as blank,
+		// not with the default - the same as a plain field does
+		$this->form_validation->set_rules('city', 'City', 'required');
+		$this->form_validation->set_rules('address[city]', 'City', 'required');
+
+		$_POST = array('city' => '', 'address' => array('city' => ''));
+		$this->assertFalse($this->form_validation->run());
+		$this->assertSame('', $this->form_validation->set_value('city', 'default'));
+		$this->assertSame('', $this->form_validation->set_value('address[city]', 'default'));
+		$this->assertSame('', set_value('address[city]', 'default'));
+
+		$_POST = array();
+	}
+
+	public function test_blank_optional_array_field_skips_rules()
+	{
+		// #113: a blank, non-required array field must not fail valid_email
+		$rules = array(array('field' => 'user[email]', 'label' => 'Email', 'rules' => 'valid_email'));
+
+		$this->assertTrue($this->run_rules($rules, array('user' => array('email' => ''))));
+		$this->assertFalse($this->run_rules($rules, array('user' => array('email' => 'invalid'))));
+	}
+
+	public function test_blank_array_field_callback_receives_empty_string()
+	{
+		$callbacks = new Form_validation_test_callbacks();
+		$this->form_validation->set_callback_object($callbacks);
+
+		$this->assertTrue($this->run_rules(
+			array(array('field' => 'address[city]', 'label' => 'City', 'rules' => 'callback_remember')),
+			array('address' => array('city' => ''))
+		));
+		$this->assertSame('', $callbacks->remembered);
+	}
+
+	public function test_rule_matches_blank_array_fields()
+	{
+		// Two blank fields match, as they do for plain fields
+		$rules = array(
+			array('field' => 'pw[a]', 'label' => 'Password', 'rules' => 'matches[pw[b]]'),
+			array('field' => 'pw[b]', 'label' => 'Confirm', 'rules' => 'trim')
+		);
+
+		$this->assertTrue($this->run_rules($rules, array('pw' => array('a' => '', 'b' => ''))));
+		$this->assertFalse($this->run_rules($rules, array('pw' => array('a' => '', 'b' => 'x'))));
 	}
 
 	public function test_set_select()
@@ -707,8 +786,16 @@ class Form_validation_test extends CI_TestCase {
  */
 class Form_validation_test_callbacks {
 
+	public $remembered = FALSE;
+
 	public function is_the_word_ok($str)
 	{
 		return $str === 'ok';
+	}
+
+	public function remember($str)
+	{
+		$this->remembered = $str;
+		return TRUE;
 	}
 }

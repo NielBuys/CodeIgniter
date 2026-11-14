@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class Security_test extends CI_TestCase {
 
 	public function set_up()
@@ -238,6 +240,8 @@ class Security_test extends CI_TestCase {
 	 * @depends test_xss_clean_sanitize_naughty_html_tags
 	 * @depends test_xss_clean_sanitize_naughty_html_attributes
 	 */
+	#[Depends('test_xss_clean_sanitize_naughty_html_tags')]
+	#[Depends('test_xss_clean_sanitize_naughty_html_attributes')]
 	public function test_naughty_html_plus_evil_attributes()
 	{
 		$this->assertEquals(

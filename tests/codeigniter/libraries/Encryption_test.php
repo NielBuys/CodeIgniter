@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
+
 class Encryption_test extends CI_TestCase {
 
 	public function set_up()
@@ -194,6 +196,8 @@ class Encryption_test extends CI_TestCase {
 	 * @depends	test_hkdf
 	 * @depends	test__get_params
 	 */
+	#[Depends('test_hkdf')]
+	#[Depends('test__get_params')]
 	public function test_initialize_encrypt_decrypt()
 	{
 		$message = 'This is a plain-text message.';
@@ -216,6 +220,7 @@ class Encryption_test extends CI_TestCase {
 	 *
 	 * @depends	test__get_params
 	 */
+	#[Depends('test__get_params')]
 	public function test_encrypt_decrypt_custom()
 	{
 		$message = 'Another plain-text message.';
@@ -236,6 +241,43 @@ class Encryption_test extends CI_TestCase {
 		$ciphertext = $this->encryption->encrypt($message, $params);
 
 		$this->assertEquals($message, $this->encryption->decrypt($ciphertext, $params));
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * NULL is encrypted and decrypted as an empty string. Before, decrypt(NULL)
+	 * without an HMAC reached base64_decode(NULL), a deprecation on PHP 8.1+.
+	 */
+	public function test_encrypt_decrypt_null()
+	{
+		$params = array(
+			'cipher' => 'aes-128',
+			'mode' => 'cbc',
+			'key' => str_repeat("\x1", 16),
+			'raw_data' => FALSE, // base64, so decrypt() reaches base64_decode()
+			'hmac' => FALSE
+		);
+
+		$deprecations = array();
+		// Only deprecations raised by the code under test count
+		set_error_handler(function ($errno, $errstr, $errfile) use (&$deprecations) {
+			basename($errfile) === 'Encryption.php' && $deprecations[] = $errstr;
+			return TRUE;
+		}, E_DEPRECATED);
+
+		try
+		{
+			$ciphertext = $this->encryption->encrypt(NULL, $params);
+			$this->assertSame('', $this->encryption->decrypt($ciphertext, $params));
+			$this->assertFalse($this->encryption->decrypt(NULL, $params));
+		}
+		finally
+		{
+			restore_error_handler();
+		}
+
+		$this->assertSame(array(), $deprecations);
 	}
 
 	// --------------------------------------------------------------------

@@ -1,0 +1,192 @@
+<?php
+
+/**
+ * Redis session driver: save_path parsing in the constructor
+ *
+ * The constructor does not connect, so these tests need neither the
+ * phpredis extension nor a Redis server.
+ */
+class Session_redis_driver_test extends CI_TestCase {
+
+	public function set_up()
+	{
+		require_once SYSTEM_PATH.'libraries/Session/CI_Session_driver_interface.php';
+		require_once SYSTEM_PATH.'libraries/Session/Session_driver.php';
+		require_once SYSTEM_PATH.'libraries/Session/drivers/Session_redis_driver.php';
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_save_path_parsing()
+	{
+		$driver = $this->_driver('tcp://127.0.0.1:6380?auth=secret&database=2&timeout=1.5', FALSE);
+		$config = $this->_config($driver);
+
+		$this->assertSame(
+			array(
+				'host' => '127.0.0.1',
+				'port' => 6380,
+				'password' => 'secret',
+				'database' => 2,
+				'timeout' => 1.5
+			),
+			$config['save_path']
+		);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_save_path_defaults()
+	{
+		$config = $this->_config($this->_driver('tcp://127.0.0.1', FALSE));
+
+		$this->assertSame(6379, $config['save_path']['port']);
+		$this->assertSame(0.0, $config['save_path']['timeout']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_unix_socket_save_path_defaults()
+	{
+		$config = $this->_config($this->_driver('/var/run/redis/redis.sock', FALSE));
+
+		$this->assertSame('/var/run/redis/redis.sock', $config['save_path']['host']);
+		$this->assertSame(0, $config['save_path']['port']);
+		$this->assertSame(0.0, $config['save_path']['timeout']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tls_save_path()
+	{
+		foreach (array('tls', 'ssl', 'TLS') as $scheme)
+		{
+			$config = $this->_config($this->_driver($scheme.'://redis.example:6380?auth=secret', FALSE));
+
+			$this->assertSame(strtolower($scheme).'://redis.example', $config['save_path']['host'], $scheme);
+			$this->assertSame(6380, $config['save_path']['port'], $scheme);
+			$this->assertSame('secret', $config['save_path']['password'], $scheme);
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tls_save_path_defaults()
+	{
+		$config = $this->_config($this->_driver('tls://redis.example?database=2&prefix=app:', FALSE));
+
+		$this->assertSame('tls://redis.example', $config['save_path']['host']);
+		$this->assertSame(6379, $config['save_path']['port']);
+		$this->assertSame(0.0, $config['save_path']['timeout']);
+		$this->assertSame(2, $config['save_path']['database']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tls_stream_options()
+	{
+		$config = $this->_config($this->_driver('tls://redis.example:6380?auth=secret&stream[cafile]=/etc/ssl/private-ca.pem&stream[verify_peer_name]=0', FALSE));
+
+		$this->assertSame('tls://redis.example', $config['save_path']['host']);
+		$this->assertSame('secret', $config['save_path']['password']);
+		$this->assertSame(
+			array('stream' => array('cafile' => '/etc/ssl/private-ca.pem', 'verify_peer_name' => '0')),
+			$config['save_path']['context']
+		);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tls_stream_option_values()
+	{
+		$config = $this->_config($this->_driver('tls://redis.example?stream[cafile]=/etc/ssl/a%26b.pem&stream[allow_self_signed]=false&stream[verify_peer]=TRUE&stream[peer_fingerprint][sha256]=abc&stream[]=x&stream[0]=y', FALSE));
+
+		$this->assertSame(
+			array(
+				'cafile' => '/etc/ssl/a&b.pem',
+				'allow_self_signed' => FALSE,
+				'verify_peer' => TRUE,
+				'peer_fingerprint' => array('sha256' => 'abc')
+			),
+			$config['save_path']['context']['stream']
+		);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_no_context_without_stream_options()
+	{
+		foreach (array('tls://redis.example:6380?auth=secret', 'tcp://127.0.0.1?stream=1', 'tls://redis.example?stream[]=x', '127.0.0.1') as $save_path)
+		{
+			$config = $this->_config($this->_driver($save_path, FALSE));
+
+			$this->assertArrayNotHasKey('context', $config['save_path'], $save_path);
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_invalid_save_path_is_cleared()
+	{
+		$config = $this->_config($this->_driver(':6379', FALSE));
+
+		$this->assertNull($config['save_path']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tcp_scheme_is_dropped()
+	{
+		$config = $this->_config($this->_driver('TCP://127.0.0.1:6380', FALSE));
+
+		$this->assertSame('127.0.0.1', $config['save_path']['host']);
+		$this->assertSame(6380, $config['save_path']['port']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_match_ip_keeps_save_path()
+	{
+		$driver = $this->_driver('tcp://127.0.0.1:6380?auth=secret&database=2', TRUE);
+		$config = $this->_config($driver);
+
+		$this->assertIsArray($config['save_path']);
+		$this->assertSame('127.0.0.1', $config['save_path']['host']);
+		$this->assertSame(6380, $config['save_path']['port']);
+		$this->assertSame('secret', $config['save_path']['password']);
+		$this->assertSame(2, $config['save_path']['database']);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_match_ip_appends_address_to_prefix()
+	{
+		$driver = $this->_driver('127.0.0.1?prefix=app:', TRUE);
+		$prefix = new ReflectionProperty($driver, '_key_prefix');
+		PHP_VERSION_ID < 80100 && $prefix->setAccessible(TRUE);
+
+		$this->assertSame('app:'.$_SERVER['REMOTE_ADDR'].':', $prefix->getValue($driver));
+	}
+
+	// --------------------------------------------------------------------
+
+	protected function _driver($save_path, $match_ip)
+	{
+		$params = array(
+			'save_path' => $save_path,
+			'match_ip' => $match_ip
+		);
+
+		return new CI_Session_redis_driver($params);
+	}
+
+	// --------------------------------------------------------------------
+
+	protected function _config($driver)
+	{
+		$config = new ReflectionProperty($driver, '_config');
+		PHP_VERSION_ID < 80100 && $config->setAccessible(TRUE);
+
+		return $config->getValue($driver);
+	}
+}

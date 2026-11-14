@@ -42,20 +42,38 @@ class DB_test extends CI_TestCase {
 
 	// ------------------------------------------------------------------------
 
-/*
-	This test is unusable, because whoever wrote it apparently thought that
-	an E_WARNING should equal an Exception and based the whole test suite
-	around that bogus assumption.
-
+	/**
+	 * The primary settings in each *_failover config cannot connect, so the
+	 * connection must come from the failover entry. mysqli and pgsql raise
+	 * an E_WARNING for the failed primary attempt; that is expected here and
+	 * must not fail the test.
+	 */
 	public function test_db_failover()
 	{
 		$config = Mock_Database_DB::config(DB_DRIVER);
 		$connection = new Mock_Database_DB($config);
-		$db = Mock_Database_DB::DB($connection->set_dsn(DB_DRIVER.'_failover'), TRUE);
+
+		set_error_handler(function () {
+			return TRUE;
+		}, E_WARNING);
+
+		try
+		{
+			$db = Mock_Database_DB::DB($connection->set_dsn(DB_DRIVER.'_failover'), TRUE);
+			$db->initialize();
+		}
+		finally
+		{
+			restore_error_handler();
+		}
 
 		$this->assertInstanceOf('CI_DB', $db);
 		$this->assertInstanceOf('CI_DB_Driver', $db);
+		$this->assertNotFalse($db->conn_id);
+
+		$failover = $config[DB_DRIVER.'_failover']['failover'][0];
+		$this->assertSame($failover['database'], $db->database);
+		empty($failover['dsn']) OR $this->assertSame($failover['dsn'], $db->dsn);
 	}
-*/
 
 }

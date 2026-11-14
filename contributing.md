@@ -8,6 +8,8 @@ Issues are a quick way to point out a bug. If you find a bug or documentation er
 2. The issue has already been fixed (check the develop branch, or look for closed Issues)
 3. Is it something really obvious that you can fix yourself?
 
+Do not report a security vulnerability that is not yet public in an issue. Report it privately instead, as described in [SECURITY.md](SECURITY.md#reporting-a-vulnerability).
+
 Reporting issues is helpful but an even better approach is to send a Pull Request, which is done by "Forking" the main repository and committing to your own copy. This will require you to use the version control system called Git.
 
 ## Guidelines
@@ -92,3 +94,29 @@ Now your fork is up to date. This should be done regularly, or before you send a
 ## PHP Unit test command
 1. `composer install --dev`
 2. `./vendor/bin/phpunit --color=always --coverage-text --configuration tests/phpunit.xml`
+
+`tests/phpunit.xml` is for PHPUnit 10 and 11 (PHP 8.1 and later). On PHP 7.4 or 8.0, Composer installs PHPUnit 9; use a `tests/travis/*.phpunit_v9.xml` file instead, for example `tests/travis/sqlite.phpunit_v9.xml`.
+
+## Running the CI tests with Docker
+
+The jobs of the PHPUnit workflow (`.github/workflows/test-phpunit.yml`) also run locally with Docker, with MySQL 8.0 and PostgreSQL 12 set up as in CI. Run them before sending a pull request. On GitHub, the workflow runs on a pull request when a maintainer adds the `run tests` label to it.
+
+You need Docker with Compose v2 (`docker compose`). Run the commands from the repository root.
+
+1. Run all six database configurations (`mysqli`, `pdo/mysql`, `pgsql`, `pdo/pgsql`, `sqlite`, `pdo/sqlite`) on PHP 8.5:
+
+   `docker compose -f tests/docker/compose.yml run --rm --build php`
+
+2. Run them on PHP 7.4, the oldest supported version. Wait for step 1 to finish first: all runs share the same test databases.
+
+   `PHP_VERSION=7.4 docker compose -f tests/docker/compose.yml run --rm --build php`
+
+   In PowerShell: `$env:PHP_VERSION = '7.4'; docker compose -f tests/docker/compose.yml run --rm --build php`, then `Remove-Item Env:PHP_VERSION` to go back to PHP 8.5.
+
+3. Each configuration prints `PASS` or `FAIL`; a failure prints PHPUnit's details. All must pass.
+
+4. When done, stop and remove the database containers:
+
+   `docker compose -f tests/docker/compose.yml down`
+
+`--build` is only needed the first time for each PHP version, or after `tests/docker/Dockerfile` changes. Any PHP version from 7.4 to 8.5 can be set in `PHP_VERSION`. To run only some configurations, name them, for example `docker compose -f tests/docker/compose.yml run --rm php sqlite pdo/sqlite`. To run with the opcache JIT on, as in the workflow's JIT job, add `JIT=1` (PHP 8.0 and later on x86-64, 8.1 and later on ARM64). See [tests/docker/README.md](tests/docker/README.md) for details.

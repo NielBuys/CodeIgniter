@@ -348,6 +348,7 @@ class CI_DB_sqlsrv_driver extends CI_DB {
 			$retval[$i]->type		= $query[$i]->DATA_TYPE;
 			$retval[$i]->max_length		= ($query[$i]->CHARACTER_MAXIMUM_LENGTH > 0) ? $query[$i]->CHARACTER_MAXIMUM_LENGTH : $query[$i]->NUMERIC_PRECISION;
 			$retval[$i]->default		= $query[$i]->COLUMN_DEFAULT;
+			$retval[$i]->is_nullable	= 1; // Not reported by this driver
 		}
 
 		return $retval;

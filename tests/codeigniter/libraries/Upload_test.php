@@ -8,7 +8,7 @@ class Upload_test extends CI_TestCase {
 		$ci->upload = new CI_Upload();
 		$ci->security = new Mock_Core_Security();
 		$ci->lang = $this->getMockBuilder('CI_Lang')->onlyMethods(array('load', 'line'))->getMock();
-		$ci->lang->expects($this->any())->method('line')->will($this->returnValue(FALSE));
+		$ci->lang->expects($this->any())->method('line')->willReturn(FALSE);
 		$this->upload = $ci->upload;
 	}
 

@@ -92,3 +92,5 @@ Now your fork is up to date. This should be done regularly, or before you send a
 ## PHP Unit test command
 1. `composer install --dev`
 2. `./vendor/bin/phpunit --color=always --coverage-text --configuration tests/phpunit.xml`
+
+`tests/phpunit.xml` is for PHPUnit 10 and 11 (PHP 8.1 and later). On PHP 7.4 or 8.0, Composer installs PHPUnit 9; use a `tests/travis/*.phpunit_v9.xml` file instead, for example `tests/travis/sqlite.phpunit_v9.xml`.

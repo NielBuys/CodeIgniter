@@ -26,7 +26,7 @@ class Date_helper_test extends CI_TestCase {
 		$config = $this->getMockBuilder('CI_Config')->getMock();
 		$config->expects($this->any())
 			   ->method('item')
-			   ->will($this->returnValue('local'));
+			   ->willReturn('local');
 
 		// Add the stub to our test instance
 		$this->ci_instance_var('config', $config);
@@ -48,7 +48,7 @@ class Date_helper_test extends CI_TestCase {
 		$config = $this->getMockBuilder('CI_Config')->getMock();
 		$config->expects($this->any())
 			   ->method('item')
-			   ->will($this->returnValue('UTC'));
+			   ->willReturn('UTC');
 
 		// Add the stub to our stdClass
 		$this->ci_instance_var('config', $config);

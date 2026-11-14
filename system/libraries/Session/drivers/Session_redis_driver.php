@@ -150,6 +150,26 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 			);
 
 			preg_match('#prefix=([^\s&]+)#', $matches[4], $match) && $this->_key_prefix = $match[1];
+
+			// SSL context options for a TLS connection, e.g. ?stream[cafile]=/path/to/ca.pem
+			// phpredis 5.3+ passes them to the stream context
+			parse_str(ltrim($matches[4], '?'), $options);
+			if (isset($options['stream']) && is_array($options['stream']))
+			{
+				$stream = array();
+				foreach ($options['stream'] as $key => $value)
+				{
+					// Option names only; parse_str() gives strings, and 'false' would be truthy
+					if (is_string($key))
+					{
+						$stream[$key] = (is_string($value) && in_array(strtolower($value), array('true', 'false'), TRUE))
+							? (strtolower($value) === 'true')
+							: $value;
+					}
+				}
+
+				empty($stream) OR $this->_config['save_path']['context'] = array('stream' => $stream);
+			}
 		}
 		else
 		{
@@ -182,8 +202,18 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 			return $this->_failure;
 		}
 
+		if (isset($this->_config['save_path']['context']) && version_compare(phpversion('redis'), '5.3', '<'))
+		{
+			log_message('error', 'Session: Redis stream options in the save path need phpredis 5.3 or later.');
+			return $this->_failure;
+		}
+
 		$redis = new Redis();
-		if ( ! $redis->connect($this->_config['save_path']['host'], $this->_config['save_path']['port'], $this->_config['save_path']['timeout']))
+		$connected = isset($this->_config['save_path']['context'])
+			? $redis->connect($this->_config['save_path']['host'], $this->_config['save_path']['port'], $this->_config['save_path']['timeout'], NULL, 0, 0, $this->_config['save_path']['context'])
+			: $redis->connect($this->_config['save_path']['host'], $this->_config['save_path']['port'], $this->_config['save_path']['timeout']);
+
+		if ( ! $connected)
 		{
 			log_message('error', 'Session: Unable to connect to Redis with the configured settings.');
 		}

@@ -243,10 +243,26 @@ upper-case schemes and `tls://` without a port. Review follow-ups in `37844eaf4`
 - The changelog and `sessions.rst` note that `tls://` needs phpredis 5.0 or later;
   4.x does not split the scheme from the host.
 
-Not done, recorded for later: there is no way to pass TLS certificate options.
-A server with a self-signed or private-CA certificate needs `openssl.cafile` in
-`php.ini`. phpredis 5.3+ accepts a stream context as the seventh `connect()`
-argument, which a future option could use.
+TLS certificate options (not part of pocketarc #66) were added on the same
+branch. Before, a server with a self-signed or private-CA certificate needed
+`openssl.cafile` in `php.ini`. The save path now takes SSL context options as
+`stream[...]` parameters (`tls://host:6380?stream[cafile]=/path/to/ca.pem`),
+passed to `Redis::connect()` as its seventh argument:
+- `true` / `false` become booleans, since `parse_str()` gives strings and the
+  string `'false'` would count as true.
+- Numeric keys are dropped.
+- phpredis 5.3 is needed for this. With an older phpredis, `open()` logs an
+  error and fails instead of connecting without the options.
+
+Tested in Docker against a Redis server with a private-CA certificate, on PHP
+7.4 and 8.4:
+- With phpredis 6.3, `stream[cafile]`, `verify_peer=0` and `verify_peer=false`
+  connect, and a missing CA or a wrong `peer_name` is refused.
+- phpredis 5.0, 5.2, 5.3 and 6.3 all connect over `tls://` without options.
+- 5.0 and 5.2 refuse `stream[...]`, and 5.3 accepts it.
+
+CI has no Redis service, so `open()` has no unit test; the constructor tests
+cover the parsing.
 
 ---
 

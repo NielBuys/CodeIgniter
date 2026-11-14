@@ -83,6 +83,49 @@ class Session_redis_driver_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
+	public function test_tls_stream_options()
+	{
+		$config = $this->_config($this->_driver('tls://redis.example:6380?auth=secret&stream[cafile]=/etc/ssl/private-ca.pem&stream[verify_peer_name]=0', FALSE));
+
+		$this->assertSame('tls://redis.example', $config['save_path']['host']);
+		$this->assertSame('secret', $config['save_path']['password']);
+		$this->assertSame(
+			array('stream' => array('cafile' => '/etc/ssl/private-ca.pem', 'verify_peer_name' => '0')),
+			$config['save_path']['context']
+		);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_tls_stream_option_values()
+	{
+		$config = $this->_config($this->_driver('tls://redis.example?stream[cafile]=/etc/ssl/a%26b.pem&stream[allow_self_signed]=false&stream[verify_peer]=TRUE&stream[peer_fingerprint][sha256]=abc&stream[]=x&stream[0]=y', FALSE));
+
+		$this->assertSame(
+			array(
+				'cafile' => '/etc/ssl/a&b.pem',
+				'allow_self_signed' => FALSE,
+				'verify_peer' => TRUE,
+				'peer_fingerprint' => array('sha256' => 'abc')
+			),
+			$config['save_path']['context']['stream']
+		);
+	}
+
+	// --------------------------------------------------------------------
+
+	public function test_no_context_without_stream_options()
+	{
+		foreach (array('tls://redis.example:6380?auth=secret', 'tcp://127.0.0.1?stream=1', 'tls://redis.example?stream[]=x', '127.0.0.1') as $save_path)
+		{
+			$config = $this->_config($this->_driver($save_path, FALSE));
+
+			$this->assertArrayNotHasKey('context', $config['save_path'], $save_path);
+		}
+	}
+
+	// --------------------------------------------------------------------
+
 	public function test_invalid_save_path_is_cleared()
 	{
 		$config = $this->_config($this->_driver(':6379', FALSE));

@@ -677,6 +677,16 @@ scheme. This needs phpredis 5.0 or later::
 
 	$config['sess_save_path'] = 'tls://redis.example.com:6380?auth=secret';
 
+If the server's certificate is self-signed or issued by a private CA, pass
+`SSL context options <https://www.php.net/manual/en/context.ssl.php>`_ as
+``stream[...]`` parameters. This needs phpredis 5.3 or later::
+
+	$config['sess_save_path'] = 'tls://redis.example.com:6380?auth=secret&stream[cafile]=/path/to/ca.pem';
+
+Write boolean options as ``1`` / ``0`` or ``true`` / ``false``. The
+``stream[...]`` values are URL-decoded, so encode characters such as ``&``,
+``+`` and ``%`` in them; ``auth`` and ``prefix`` are used as written.
+
 Memcached Driver
 ----------------
 

@@ -1,0 +1,62 @@
+# Runs the jobs of the GitHub workflow (.github/workflows/test-phpunit.yml)
+# locally, for when GitHub Actions is disabled on this repository. See
+# tests/docker/README.md.
+#
+# MySQL and PostgreSQL are set up like the workflow's services. All three
+# services share one network namespace, so the test configs in
+# tests/mocks/database/config reach the databases on 127.0.0.1 / localhost as
+# they do in CI. No ports are published on the host.
+
+name: codeigniter-tests
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_USER: travis
+      MYSQL_PASSWORD: travis
+      MYSQL_DATABASE: ci_test
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-utravis", "-ptravis"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  postgres:
+    image: postgres:12
+    network_mode: "service:mysql"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ci_test
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    depends_on:
+      - mysql
+
+  php:
+    build:
+      context: .
+      args:
+        PHP: ${PHP_VERSION:-8.5}
+    image: codeigniter-tests:${PHP_VERSION:-8.5}
+    network_mode: "service:mysql"
+    environment:
+      COMPOSER_CACHE_DIR: /composer-cache
+      JIT: ${JIT:-0}
+    volumes:
+      - ../..:/src:ro
+      - composer-cache:/composer-cache
+    entrypoint: ["sh", "/src/tests/docker/run-tests.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+volumes:
+  composer-cache:

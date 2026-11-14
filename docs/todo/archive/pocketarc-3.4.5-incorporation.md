@@ -174,9 +174,8 @@ CLI, so the detection itself was not reproduced here.
 ### It does not reach existing applications
 
 `mimes.php` lives under `application/config/`, which each application owns.
-Apps load `system/` from this package, not `application/`. NCompPOSv2, for
-example, has its own copy without `text/plain`
-(`NCompPOSv2/application/config/mimes.php:117`). The change only affects new
+Apps load `system/` from this package, not `application/`, and keep their own
+copy of `mimes.php`. The change only affects new
 projects started from this template. An application that needs it must edit its
 own `mimes.php`.
 

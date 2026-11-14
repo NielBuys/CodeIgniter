@@ -1,25 +1,31 @@
 name: PHPUnit
 
-# Run once per change: on pull requests, and on pushes to the two long-lived
-# branches. A push to a task branch is tested through its pull request, so it
-# does not also run on its own. Tag pushes do not run; the branch push that
-# carries the same commit already did.
+# Runs on pushes to the two long-lived branches, and on a pull request when the
+# "run tests" label is added to it. Pushes to a pull request do not start a run
+# on their own: to test new commits, remove the label and add it again.
+# Re-running a finished run tests the same commit as before. Any other label
+# starts a run whose jobs are skipped.
+# A push to a task branch is tested through its pull request, so it does not
+# also run on its own. Tag pushes do not run; the branch push that carries the
+# same commit already did. "Run workflow" on the Actions tab runs any branch.
 on:
   push:
     branches: [ develop, 3.1-stable ]
   pull_request:
+    types: [ labeled ]
   workflow_dispatch:
 
-# A newer push to the same pull request cancels the run it replaces.
+# A newer "run tests" label event on the same pull request cancels the run it
+# replaces. Other labels use their own group, so they do not cancel a test run.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event.label.name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   tests:
     name: tests (${{ matrix.php }}, ${{ matrix.DB }}${{ matrix.jit && ', jit' || '' }})
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    if: "!contains(github.event.head_commit.message, '[ci skip]') && (github.event_name != 'pull_request' || github.event.label.name == 'run tests')"
     env:
       PHP_INI_VALUES: assert.exception=1, zend.assertions=1
 

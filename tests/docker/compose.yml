@@ -1,5 +1,5 @@
 # Runs the jobs of the GitHub workflow (.github/workflows/test-phpunit.yml)
-# locally, for when GitHub Actions is disabled on this repository. See
+# locally, to test a change before opening a pull request. See
 # tests/docker/README.md.
 #
 # MySQL and PostgreSQL are set up like the workflow's services. All three

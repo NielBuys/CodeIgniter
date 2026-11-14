@@ -55,11 +55,10 @@ One additional measure to take in production environments is to disable PHP erro
 Running tests
 *************
 
-GitHub has disabled GitHub Actions on this repository, so the PHPUnit
-workflow (``.github/workflows/test-phpunit.yml``) does not run
-on pull requests. Every pull request must pass the tests before it is created.
-The workflow's jobs run locally with Docker, with MySQL and PostgreSQL set up
-as in CI. See
+The PHPUnit workflow (``.github/workflows/test-phpunit.yml``) runs on pushes
+to the develop and 3.1-stable branches, and on a pull request when the
+``run tests`` label is added to it. The workflow's jobs also run locally with
+Docker, with MySQL and PostgreSQL set up as in CI. See
 `tests/docker/README.md <https://github.com/NielBuys/CodeIgniter/blob/develop/tests/docker/README.md>`_.
 
 *******

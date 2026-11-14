@@ -44,6 +44,15 @@ Before finishing, check:
 grep -nE '\b(we|our|you|your|I)\b' docs/todo/<file>.md
 ```
 
+## Public
+
+This repository is public, so everything in this folder is public. Name no
+private application, customer or person, and give no local machine paths,
+internal host names or IP addresses. When a change is checked against an
+application that uses this framework, say "an application using this
+repository", not its name or path. Before finishing, search the file for
+application names, paths and email addresses.
+
 ## Evidence rules
 
 Every factual claim about this codebase must be verified against the code, not

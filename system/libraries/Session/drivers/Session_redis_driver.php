@@ -134,41 +134,53 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 		{
 			log_message('error', 'Session: No Redis save path configured.');
 		}
-		elseif (preg_match('#(?:tcp://)?([^:?]+)(?:\:(\d+))?(\?.+)?#', $this->_config['save_path'], $matches))
+		elseif (preg_match('#^(?:(tcp|tls|ssl)://)?([^:?]+)(?:\:(\d+))?(\?.+)?#i', $this->_config['save_path'], $matches))
 		{
-			isset($matches[3]) OR $matches[3] = ''; // Just to avoid undefined index notices below
+			isset($matches[4]) OR $matches[4] = ''; // Just to avoid undefined index notices below
+			$scheme = strtolower($matches[1]);
 			$this->_config['save_path'] = array(
-				'host' => $matches[1],
-				'port' => empty($matches[2]) ? NULL : $matches[2],
-				'password' => preg_match('#auth=([^\s&]+)#', $matches[3], $match) ? $match[1] : NULL,
-				'database' => preg_match('#database=(\d+)#', $matches[3], $match) ? (int) $match[1] : NULL,
-				'timeout' => preg_match('#timeout=(\d+\.\d+)#', $matches[3], $match) ? (float) $match[1] : NULL
+				// phpredis needs the tls:// or ssl:// scheme in the host to enable encryption; tcp:// is the default
+				'host' => (in_array($scheme, array('tls', 'ssl'), TRUE) ? $scheme.'://' : '').$matches[2],
+				// Redis::connect() takes an int port and a float timeout; NULL for either is deprecated on PHP 8.1+.
+				// A unix socket path needs a port below 1, which is what NULL used to become.
+				'port' => empty($matches[3]) ? ($matches[2][0] === '/' ? 0 : 6379) : (int) $matches[3],
+				'password' => preg_match('#auth=([^\s&]+)#', $matches[4], $match) ? $match[1] : NULL,
+				'database' => preg_match('#database=(\d+)#', $matches[4], $match) ? (int) $match[1] : NULL,
+				'timeout' => preg_match('#timeout=(\d+\.\d+)#', $matches[4], $match) ? (float) $match[1] : 0.0
 			);
 
-			preg_match('#prefix=([^\s&]+)#', $matches[3], $match) && $this->_key_prefix = $match[1];
+			preg_match('#prefix=([^\s&]+)#', $matches[4], $match) && $this->_key_prefix = $match[1];
+
+			// SSL context options for a TLS connection, e.g. ?stream[cafile]=/path/to/ca.pem
+			// phpredis 5.3+ passes them to the stream context
+			parse_str(ltrim($matches[4], '?'), $options);
+			if (isset($options['stream']) && is_array($options['stream']))
+			{
+				$stream = array();
+				foreach ($options['stream'] as $key => $value)
+				{
+					// Option names only; parse_str() gives strings, and 'false' would be truthy
+					if (is_string($key))
+					{
+						$stream[$key] = (is_string($value) && in_array(strtolower($value), array('true', 'false'), TRUE))
+							? (strtolower($value) === 'true')
+							: $value;
+					}
+				}
+
+				empty($stream) OR $this->_config['save_path']['context'] = array('stream' => $stream);
+			}
 		}
 		else
 		{
 			log_message('error', 'Session: Invalid Redis save path format: '.$this->_config['save_path']);
+			// open() treats an empty save path as a failure; a string here would break it on PHP 8
+			$this->_config['save_path'] = NULL;
 		}
 
 		if ($this->_config['match_ip'] === TRUE)
 		{
-			if (isset($matches['options']))
-			{
-				$save_path['password'] = preg_match('#auth=([^\s&]+)#', $matches['options'], $match) ? $match[1] : NULL;
-				$save_path['database'] = preg_match('#database=(\d+)#', $matches['options'], $match) ? (int) $match[1] : NULL;
-				$save_path['timeout']  = preg_match('#timeout=(\d+\.\d+)#', $matches['options'], $match) ? (float) $match[1] : 0.0;
-
-				preg_match('#prefix=([^\s&]+)#', $matches['options'], $match) && $this->_key_prefix = $match[1];
-			}
-
-			$this->_config['save_path'] = $save_path;
-
-			if ($this->_config['match_ip'] === TRUE)
-			{
-				$this->_key_prefix .= $_SERVER['REMOTE_ADDR'].':';
-			}
+			$this->_key_prefix .= $_SERVER['REMOTE_ADDR'].':';
 		}
 	}
 
@@ -190,8 +202,18 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 			return $this->_failure;
 		}
 
+		if (isset($this->_config['save_path']['context']) && version_compare(phpversion('redis'), '5.3', '<'))
+		{
+			log_message('error', 'Session: Redis stream options in the save path need phpredis 5.3 or later.');
+			return $this->_failure;
+		}
+
 		$redis = new Redis();
-		if ( ! $redis->connect($this->_config['save_path']['host'], $this->_config['save_path']['port'], $this->_config['save_path']['timeout']))
+		$connected = isset($this->_config['save_path']['context'])
+			? $redis->connect($this->_config['save_path']['host'], $this->_config['save_path']['port'], $this->_config['save_path']['timeout'], NULL, 0, 0, $this->_config['save_path']['context'])
+			: $redis->connect($this->_config['save_path']['host'], $this->_config['save_path']['port'], $this->_config['save_path']['timeout']);
+
+		if ( ! $connected)
 		{
 			log_message('error', 'Session: Unable to connect to Redis with the configured settings.');
 		}

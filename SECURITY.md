@@ -101,6 +101,42 @@ repository can report them.
 
 ## Reporting a vulnerability
 
-Open a private report or contact the maintainer directly rather than filing a public
-issue for unpatched flaws. For tracking already-public advisories, label issues
-`security-watch`.
+Report a security vulnerability privately through GitHub. Do not open a public
+issue, pull request or discussion for it: a private report is visible only to the
+maintainers until a fix and an advisory are published.
+
+1. Sign in to GitHub and open the repository's
+   [security page](https://github.com/NielBuys/CodeIgniter/security).
+2. Click **Report a vulnerability**, or go straight to
+   <https://github.com/NielBuys/CodeIgniter/security/advisories/new>.
+3. Fill in the form. Put the details listed below in the description.
+4. Submit the report. It becomes a private draft advisory, where the maintainers
+   reply and any follow-up takes place.
+
+### What to include
+
+- **Where:** the file and the function or method, for example
+  `system/libraries/Upload.php`, `do_upload()`.
+- **Versions:** the release of this fork (as shown by
+  `composer show nielbuys/framework`, or the downloaded release tag) and the PHP
+  version. `CI_VERSION` in `system/core/CodeIgniter.php` matches the release from
+  3.1.24 onwards; earlier releases show `3.1.13-dev`.
+- **Setup:** the configuration needed to trigger it, such as config items, the
+  database driver or the web server.
+- **Steps to reproduce:** or a minimal proof of concept. Use made-up data; leave
+  out real user data, credentials and host names.
+- **Impact:** what an attacker can do, and what they need first (a login, a
+  particular setting, or a particular way the application calls the framework).
+- **Related reports:** whether upstream CodeIgniter 3 (`bcit-ci/CodeIgniter`) or
+  CodeIgniter 4 has the same flaw, and any existing CVE or advisory.
+- **Fix:** a suggested fix, if there is one.
+
+### After a report
+
+The maintainers check whether this fork is affected, prepare a fix, and release it
+in the next version. The advisory is published with the release. Reporters can be
+credited in the advisory.
+
+A vulnerability that is already public, such as a published CVE for CodeIgniter 3,
+can be raised in a normal issue so it can be checked against this fork. The ones
+already checked are listed under "Known advisories" above.

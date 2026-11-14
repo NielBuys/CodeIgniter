@@ -8,6 +8,8 @@ Issues are a quick way to point out a bug. If you find a bug or documentation er
 2. The issue has already been fixed (check the develop branch, or look for closed Issues)
 3. Is it something really obvious that you can fix yourself?
 
+Do not report a security vulnerability that is not yet public in an issue. Report it privately instead, as described in [SECURITY.md](SECURITY.md#reporting-a-vulnerability).
+
 Reporting issues is helpful but an even better approach is to send a Pull Request, which is done by "Forking" the main repository and committing to your own copy. This will require you to use the version control system called Git.
 
 ## Guidelines

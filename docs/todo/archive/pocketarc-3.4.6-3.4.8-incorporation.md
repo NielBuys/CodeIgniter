@@ -5,9 +5,11 @@ https://github.com/pocketarc/codeigniter/releases/tag/3.4.7 (2026-11-02),
 https://github.com/pocketarc/codeigniter/releases/tag/3.4.8 (2026-11-08)
 **Target:** this repository (CodeIgniter 3.1-stable derivative)
 **Reviewed:** 2026-11-13
-**Status:** Sections 2–8 applied 2026-11-13, each with tests. Sections 2 and 3
-(Redis: `sess_match_ip`, #6164 defaults, TLS) are in PR #23; sections 4–8 are in
-PR #25. Optional sections 9–13 were not taken (**Decided: not now**, section 18).
+**Status:** Applied in 3.1.25. Sections 2–8 applied 2026-11-13, each with
+tests. Sections 2 and 3 (Redis: `sess_match_ip`, #6164 defaults, TLS) are in
+PR #23; sections 4–8 are in PR #25. Of the optional sections, 9 and 12 were later
+applied in PR #27 (PHP 8.1+ deprecations); 10, 11 and 13 were not taken
+(**Decided: not now**, section 18). PRs #23, #25 and #27 merged 2026-11-14.
 **Verdict:** Six changes apply here, all small: Redis session TLS, the PostgreSQL
 column comment after a rename, WebP transparency, the captcha clean-up crash on
 PHP 8, a `NULL` cookie value and a float passed to `date()` in the logger. Scoping
@@ -432,6 +434,8 @@ $label = ($label === NULL OR $label === '') ? $field : $label;
 The other two hunks of #75 (`_reset_data_array()` and `$allow_arrays`) change
 `develop`'s `is_array` rule handling. Neither exists in this tree; not applicable.
 
+**Decided: applied** in PR #27 (2026-11-14), the label fallback only.
+
 ---
 
 ## 10. PR #63 — cache path normalisation — OPTIONAL
@@ -483,6 +487,8 @@ enabled reaches `base64_decode(NULL)`
 deprecation. The result is still `FALSE`. Adding
 `$data === NULL && $data = '';` at the top of `encrypt()` and `decrypt()`, as
 pocketarc does, removes it. pocketarc's `Encryption_test.php` cases should port.
+
+**Decided: applied** in PR #27 (2026-11-14), with tests.
 
 ---
 
@@ -553,6 +559,8 @@ parsed, but only for configurations that do not work today.
    encryption edge (§12), the escape-character regression test (§13).
    **Decided (2026-11-13): not now.** The Actions version bump (§11) would also
    touch the workflow file changed by PR #24.
+   **Later (2026-11-14):** §9 and §12 were applied in PR #27, which fixed PHP
+   8.1+ deprecations.
 6. **No action** on the items in §14: they repair `develop` code this
    repository does not carry.
 

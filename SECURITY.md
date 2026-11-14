@@ -42,7 +42,7 @@ fork's `system/` directory before acting, then patch on a dedicated `tasks/` bra
 
 Based on a systematic sweep (2026-07-17) of the FriendsOfPHP/PHP Security Advisories
 DB — the source `composer audit` uses — and the GitHub Advisory Database entries for
-`codeigniter/framework`. Re-swept 2026-10-06 (see "Sweep log" below).
+`codeigniter/framework`. Re-swept 2026-10-06 and 2026-11-14 (see "Sweep log" below).
 
 ### Framework issues fixed upstream at or below this fork's base (inherited)
 
@@ -85,11 +85,11 @@ DB — the source `composer audit` uses — and the GitHub Advisory Database ent
 ### Development dependencies
 
 Not shipped to users of this fork (`require-dev` only), but `composer audit` on this
-repository reports them.
+repository can report them.
 
 | Package | Advisory | Status |
 |---|---|---|
-| `phpunit/phpunit` (locked 11.5.42) | CVE-2026-24765 (GHSA-vvj3-c3rp-c85p) — unsafe deserialization in PHPT code-coverage handling; fixed in 11.5.50 | ⚠️ **Locked version affected.** Not exploitable here: the test suite has no `.phpt` tests, so the affected code path never runs. Fix by updating the lock: `composer update phpunit/phpunit`. The PHP 7.4 CI job installs `^9.0` fresh and gets a fixed 9.6.x. |
+| `phpunit/phpunit` | CVE-2026-24765 (GHSA-vvj3-c3rp-c85p) — unsafe deserialization in PHPT code-coverage handling; fixed in 9.6.33, 10.5.62 and 11.5.50 | ✅ **Not affected.** `composer.lock` is not committed (it is in `.gitignore`), so CI, `tests/docker` and a fresh `composer install` resolve a fixed version (11.5.58, 10.5.67 and 9.6.39 on 2026-11-14). A local lock created before the fix still reports it; refresh it with `composer update phpunit/phpunit`. Not exploitable in any case: the test suite has no `.phpt` tests, so the affected code path never runs. |
 
 ### Sweep log
 
@@ -97,6 +97,7 @@ repository reports them.
 |---|---|---|
 | 2026-07-17 | FriendsOfPHP DB, GitHub Advisory DB | Initial tables above |
 | 2026-10-06 | GitHub Advisory DB (`codeigniter/framework`, `nielbuys/framework`, `pocketarc/codeigniter`), FriendsOfPHP DB (no commits under `codeigniter/` since 2026-07-01), Packagist security-advisories API for every package in `composer.lock` (equivalent of `composer audit`), NVD keyword search for CVEs published 2026-07-01 to 2026-10-07, Snyk, web search | No new framework advisory. Added the previously unlisted CVE-2018-12071 (inherited fix) and CVE-2024-41344's ID. New CVEs are CI4 / CI4-app / app-level; one CI4 counterpart (`is_https()`) recorded as low. PHPUnit lock affected but not exploitable. OpenCVE not checked (needs an account); NVD covers the same CVE data. |
+| 2026-11-14 | GitHub Advisory DB (`codeigniter/framework`, `nielbuys/framework`, `pocketarc/codeigniter`, and a keyword search for `codeigniter` published after 2026-10-05), Packagist security-advisories API, FriendsOfPHP DB (no commits under `codeigniter/` or `codeigniter4/` since 2026-10-01), `composer audit`, pocketarc releases 3.4.6–3.4.8 (no security fixes), web search | No new framework advisory; the newest CodeIgniter CVEs are the CI4 ones published 2026-08-07, already listed. Older application-level CVEs that name CodeIgniter, published before the previous sweep and not listed above, are recorded here for completeness: Ecommerce-CodeIgniter-Bootstrap CVE-2026-14632 to 14637 (2026-07-04) and CodeIgniter-StudentManagementSystem CVE-2026-9517/9518 (2026-05-26). The NVD API was unavailable (HTTP 503). PHPUnit entry corrected: `composer.lock` is not committed, so fresh installs are not affected. |
 
 ## Reporting a vulnerability
 

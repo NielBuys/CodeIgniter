@@ -51,6 +51,17 @@ After moving them, open your main index.php file and set the $system_path, $appl
 
 One additional measure to take in production environments is to disable PHP error reporting and any other development-only functionality. In CodeIgniter, this can be done by setting the ENVIRONMENT constant, which is more fully described on the security page.
 
+*************
+Running tests
+*************
+
+GitHub has disabled GitHub Actions on this repository, so the PHPUnit
+workflow (``.github/workflows/test-phpunit.yml``) does not run
+on pull requests. Every pull request must pass the tests before it is created.
+The workflow's jobs run locally with Docker, with MySQL and PostgreSQL set up
+as in CI. See
+`tests/docker/README.md <https://github.com/NielBuys/CodeIgniter/blob/develop/tests/docker/README.md>`_.
+
 *******
 License
 *******

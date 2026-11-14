@@ -1,6 +1,0 @@
-# Links shown on the "New issue" page. Blank issues stay enabled.
-blank_issues_enabled: true
-contact_links:
-  - name: Report a security vulnerability
-    url: https://github.com/NielBuys/CodeIgniter/security/advisories/new
-    about: Report a security vulnerability that is not yet public here, privately, not in an issue. See SECURITY.md for what to include.

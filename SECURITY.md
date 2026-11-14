@@ -1,5 +1,47 @@
 # Security Policy
 
+## Reporting a vulnerability
+
+Report a security vulnerability privately through GitHub. Do not open a public
+issue, pull request or discussion for it: a private report is visible only to the
+maintainers until a fix and an advisory are published.
+
+1. Sign in to GitHub and open the repository's
+   [security page](https://github.com/NielBuys/CodeIgniter/security).
+2. Click **Report a vulnerability**, or go straight to
+   <https://github.com/NielBuys/CodeIgniter/security/advisories/new>.
+3. Fill in the form. Put the details listed below in the description.
+4. Submit the report. It becomes a private draft advisory, where the maintainers
+   reply and any follow-up takes place.
+
+### What to include
+
+- **Where:** the file and the function or method, for example
+  `system/libraries/Upload.php`, `do_upload()`.
+- **Versions:** the release of this fork (as shown by
+  `composer show nielbuys/framework`, or the downloaded release tag) and the PHP
+  version. `CI_VERSION` in `system/core/CodeIgniter.php` matches the release from
+  3.1.24 onwards; earlier releases show `3.1.13-dev`.
+- **Setup:** the configuration needed to trigger it, such as config items, the
+  database driver or the web server.
+- **Steps to reproduce:** or a minimal proof of concept. Use made-up data; leave
+  out real user data, credentials and host names.
+- **Impact:** what an attacker can do, and what they need first (a login, a
+  particular setting, or a particular way the application calls the framework).
+- **Related reports:** whether upstream CodeIgniter 3 (`bcit-ci/CodeIgniter`) or
+  CodeIgniter 4 has the same flaw, and any existing CVE or advisory.
+- **Fix:** a suggested fix, if there is one.
+
+### After a report
+
+The maintainers check whether this fork is affected, prepare a fix, and release it
+in the next version. The advisory is published with the release. Reporters can be
+credited in the advisory.
+
+A vulnerability that is already public, such as a published CVE for CodeIgniter 3,
+can be raised in a normal issue so it can be checked against this fork. The ones
+already checked are listed under "Known advisories" below.
+
 ## About this fork
 
 This repository is a **maintained fork of CodeIgniter 3**, branched from upstream
@@ -98,45 +140,3 @@ repository can report them.
 | 2026-07-17 | FriendsOfPHP DB, GitHub Advisory DB | Initial tables above |
 | 2026-10-06 | GitHub Advisory DB (`codeigniter/framework`, `nielbuys/framework`, `pocketarc/codeigniter`), FriendsOfPHP DB (no commits under `codeigniter/` since 2026-07-01), Packagist security-advisories API for every package in `composer.lock` (equivalent of `composer audit`), NVD keyword search for CVEs published 2026-07-01 to 2026-10-07, Snyk, web search | No new framework advisory. Added the previously unlisted CVE-2018-12071 (inherited fix) and CVE-2024-41344's ID. New CVEs are CI4 / CI4-app / app-level; one CI4 counterpart (`is_https()`) recorded as low. PHPUnit lock affected but not exploitable. OpenCVE not checked (needs an account); NVD covers the same CVE data. |
 | 2026-11-14 | GitHub Advisory DB (`codeigniter/framework`, `nielbuys/framework`, `pocketarc/codeigniter`, and a keyword search for `codeigniter` published after 2026-10-05), Packagist security-advisories API, FriendsOfPHP DB (no commits under `codeigniter/` or `codeigniter4/` since 2026-10-01), `composer audit`, pocketarc releases 3.4.6–3.4.8 (no security fixes), web search | No new framework advisory; the newest CodeIgniter CVEs are the CI4 ones published 2026-08-07, already listed. Older application-level CVEs that name CodeIgniter, published before the previous sweep and not listed above, are recorded here for completeness: Ecommerce-CodeIgniter-Bootstrap CVE-2026-14632 to 14637 (2026-07-04) and CodeIgniter-StudentManagementSystem CVE-2026-9517/9518 (2026-05-26). The NVD API was unavailable (HTTP 503). PHPUnit entry corrected: `composer.lock` is not committed, so fresh installs are not affected. |
-
-## Reporting a vulnerability
-
-Report a security vulnerability privately through GitHub. Do not open a public
-issue, pull request or discussion for it: a private report is visible only to the
-maintainers until a fix and an advisory are published.
-
-1. Sign in to GitHub and open the repository's
-   [security page](https://github.com/NielBuys/CodeIgniter/security).
-2. Click **Report a vulnerability**, or go straight to
-   <https://github.com/NielBuys/CodeIgniter/security/advisories/new>.
-3. Fill in the form. Put the details listed below in the description.
-4. Submit the report. It becomes a private draft advisory, where the maintainers
-   reply and any follow-up takes place.
-
-### What to include
-
-- **Where:** the file and the function or method, for example
-  `system/libraries/Upload.php`, `do_upload()`.
-- **Versions:** the release of this fork (as shown by
-  `composer show nielbuys/framework`, or the downloaded release tag) and the PHP
-  version. `CI_VERSION` in `system/core/CodeIgniter.php` matches the release from
-  3.1.24 onwards; earlier releases show `3.1.13-dev`.
-- **Setup:** the configuration needed to trigger it, such as config items, the
-  database driver or the web server.
-- **Steps to reproduce:** or a minimal proof of concept. Use made-up data; leave
-  out real user data, credentials and host names.
-- **Impact:** what an attacker can do, and what they need first (a login, a
-  particular setting, or a particular way the application calls the framework).
-- **Related reports:** whether upstream CodeIgniter 3 (`bcit-ci/CodeIgniter`) or
-  CodeIgniter 4 has the same flaw, and any existing CVE or advisory.
-- **Fix:** a suggested fix, if there is one.
-
-### After a report
-
-The maintainers check whether this fork is affected, prepare a fix, and release it
-in the next version. The advisory is published with the release. Reporters can be
-credited in the advisory.
-
-A vulnerability that is already public, such as a published CVE for CodeIgniter 3,
-can be raised in a normal issue so it can be checked against this fork. The ones
-already checked are listed under "Known advisories" above.

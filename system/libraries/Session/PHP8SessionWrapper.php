@@ -92,12 +92,16 @@ class CI_SessionWrapper implements SessionHandlerInterface, SessionIdInterface, 
 	 * Create a session ID
 	 *
 	 * Required of every handler from PHP 9.0, and deprecated to omit from
-	 * PHP 8.6. Generated here rather than through session_create_id(),
-	 * which calls back into this method while a session is active, as it
-	 * is during session_start() and session_regenerate_id().
+	 * PHP 8.6.
 	 *
 	 * The format must match CI_Session::_configure_sid_length(), which
-	 * pins every session ID to 32 hex characters.
+	 * pins every session ID to 32 hex characters. Generating the ID here
+	 * gives that format without depending on the session.sid_length and
+	 * session.sid_bits_per_character settings, deprecated from PHP 8.4.
+	 *
+	 * Calling session_create_id() here would also work: from inside a save
+	 * handler it uses PHP's own generator and does not call back into this
+	 * method.
 	 *
 	 * @return	string
 	 */
